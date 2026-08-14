@@ -231,7 +231,7 @@ function renderScore(){
   const max=Math.max(...totals);
   const done=GAMES.every((g,gi)=>state.teams.some((_,ti)=>(+state.scores[ti][gi]||0)>0)); // 모든 게임에 점수 반영됨
   document.getElementById('winner').innerHTML =
-    max>0 ? `${done?'🏆 우승: ':'현재 1위: '}${state.teams.map((t,i)=>totals[i]===max?t.name:'').filter(Boolean).join(', ')} (${max}점)` : '';
+    (done && max>0) ? `🏆 우승: ${state.teams.map((t,i)=>totals[i]===max?t.name:'').filter(Boolean).join(', ')} (${max}점)` : '';
   document.getElementById('scoreHint').textContent='점수를 직접 입력하거나 "이김"을 체크하면 그 게임 배점만큼 자동 반영돼요.';
 }
 
