@@ -72,9 +72,6 @@
 <nav>
   <button data-tab="schedule" class="active">진행 순서</button>
   <button data-tab="teams">팀</button>
-  <button data-tab="ox">OX 퀴즈</button>
-  <button data-tab="charades">몸으로 말해요</button>
-  <button data-tab="initials">초성 퀴즈</button>
   <button data-tab="score">점수판</button>
 </nav>
 <main>
@@ -100,9 +97,9 @@
     </div>
   </section>
 
-  <section id="ox"><div class="card"><div class="stage" id="oxStage"></div></div></section>
-  <section id="charades"><div class="card"><div class="stage" id="chStage"></div></div></section>
-  <section id="initials"><div class="card"><div class="stage" id="inStage"></div></div></section>
+  <section id="ox"><div class="card"><button class="btn g sm back">← 진행 순서</button><div class="stage" id="oxStage"></div></div></section>
+  <section id="charades"><div class="card"><button class="btn g sm back">← 진행 순서</button><div class="stage" id="chStage"></div></div></section>
+  <section id="initials"><div class="card"><button class="btn g sm back">← 진행 순서</button><div class="stage" id="inStage"></div></div></section>
 
   <section id="score">
     <div class="card">
@@ -120,9 +117,9 @@
 /* ---------- data ---------- */
 const GAMES = [
   {emoji:'🎯', name:'나이를 맞춰라',            time:'10분', score:10},
-  {emoji:'⭕❌', name:'OX 퀴즈 (상식+넌센스)',   time:'15분', score:20},
-  {emoji:'🤸', name:'몸으로 말해요',            time:'30분', score:30},
-  {emoji:'💡', name:'초성 & 영화 제목 맞추기',  time:'15분', score:25},
+  {emoji:'⭕❌', name:'OX 퀴즈 (상식+넌센스)',   time:'15분', score:20, tab:'ox'},
+  {emoji:'🤸', name:'몸으로 말해요',            time:'30분', score:30, tab:'charades'},
+  {emoji:'💡', name:'초성 & 영화 제목 맞추기',  time:'15분', score:25, tab:'initials'},
   {emoji:'📌', name:'포스트잇 떼기',            time:'10분', score:30},
   {emoji:'📰', name:'신문지 오래 버티기 (결승)', time:'15분', score:35},
 ];
@@ -179,26 +176,30 @@ let state=load(); // {teams:[{name,members[]}], scores:[[..6]], revealed:[bool x
 if(!state.revealed) state.revealed=GAMES.map(()=>false);
 
 /* ---------- tabs ---------- */
-document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
-  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
-  document.querySelectorAll('section').forEach(x=>x.classList.remove('active'));
-  b.classList.add('active');
-  document.getElementById(b.dataset.tab).classList.add('active');
-  if(b.dataset.tab==='score') renderScore();
-});
+function activate(id){
+  document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active', x.dataset.tab===id));
+  document.querySelectorAll('section').forEach(x=>x.classList.toggle('active', x.id===id));
+  window.scrollTo(0,0);
+  if(id==='score') renderScore();
+}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>activate(b.dataset.tab));
+document.querySelectorAll('.back').forEach(b=>b.onclick=()=>activate('schedule'));
 
-/* ---------- schedule (reveal one by one) ---------- */
+/* ---------- schedule (reveal one by one -> jump to game) ---------- */
 function renderSched(){
   document.getElementById('sched').innerHTML = GAMES.map((g,i)=>{
     const shown=state.revealed[i];
     const body = shown
       ? `<div class="body">${g.emoji} ${g.name} <span class="meta">· ${g.time} · ${g.score}점</span></div>`
       : `<div class="body"><span class="hidden-label">? ? ?</span></div>`;
+    const label = !shown ? '공개' : (g.tab ? '게임 열기 ▶' : '발표됨');
     return `<div class="sched-item"><div class="no">${i+1}</div>${body}
-      <button class="btn ${shown?'g':'p'} sm" data-i="${i}">${shown?'숨기기':'공개'}</button></div>`;
+      <button class="btn ${shown&&!g.tab?'g':'p'} sm" data-i="${i}" ${shown&&!g.tab?'disabled style="opacity:.5"':''}>${label}</button></div>`;
   }).join('');
   document.querySelectorAll('#sched button').forEach(btn=>btn.onclick=()=>{
-    const i=+btn.dataset.i; state.revealed[i]=!state.revealed[i]; save(state); renderSched();
+    const i=+btn.dataset.i, g=GAMES[i];
+    state.revealed[i]=true; save(state); renderSched();
+    if(g.tab) activate(g.tab); // 화면 있는 게임이면 바로 이동
   });
 }
 
