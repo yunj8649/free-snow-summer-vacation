@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OX 퀴즈</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="gamepage">
+  <div class="card">
+    <a class="btn g sm back-link" href="./index.html">← 진행 순서</a>
+    <div class="stage" id="oxStage"></div>
+  </div>
+</main>
+<script src="data.js"></script>
+<script src="game.js"></script>
+<script>
+  makeQuiz('oxStage', OX.map(o=>({ badge:'OX', q:o.q, note:o.e||'', cls:o.a?'o big':'x big', _a:o.a })), it=> it._a ? 'O' : 'X');
+</script>
+</body>
+</html>
