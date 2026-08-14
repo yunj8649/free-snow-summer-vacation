@@ -58,11 +58,6 @@
   .qtext .drawB { font-size:1.5rem; padding:18px 36px; }
   .ctrl { display:flex; gap:8px; align-items:center; justify-content:center; flex-wrap:wrap; color:var(--mut); font-size:.9rem; margin-bottom:6px; }
   .ctrl input { width:64px; text-align:center; padding:5px; }
-  .keylist { text-align:left; margin-top:20px; border-top:1px solid var(--line); padding-top:12px; max-height:360px; overflow:auto; }
-  .keylist .keyhead { color:var(--hot); font-weight:700; margin-bottom:8px; }
-  .keylist > div { padding:6px 6px; border-bottom:1px solid var(--line); font-size:1rem; border-radius:6px; }
-  .keylist > div.cur { background:rgba(255,204,77,.15); }
-  .keylist b { color:var(--accent); }
   .answer { font-size:2.4rem; font-weight:800; margin-top:16px; min-height:2.6rem; }
   .answer.o { color:var(--ok); } .answer.x { color:var(--hot); }
   .answer.big { font-size:5rem; font-weight:900; line-height:1; }
@@ -122,65 +117,13 @@
   </section>
 
   <footer style="text-align:center; padding:10px 0 30px">
+    <a class="btn g sm" href="./answers.html" target="_blank" style="text-decoration:none; display:inline-block; margin-bottom:10px">🔑 정답표 (진행자용, 새 탭)</a><br>
     <button class="btn g sm" id="resetAll">🗑 데이터 초기화 (팀·점수·공개상태)</button>
   </footer>
 </main>
 
+<script src="data.js"></script>
 <script>
-/* ---------- data ---------- */
-const GAMES = [
-  {emoji:'🎯', name:'나이를 맞춰라',            time:'10분', score:10},
-  {emoji:'⭕❌', name:'OX 퀴즈 (상식+넌센스)',   time:'15분', score:20, tab:'ox'},
-  {emoji:'🤸', name:'몸으로 말해요',            time:'30분', score:30, tab:'charades'},
-  {emoji:'💡', name:'초성 맞추기',              time:'15분', score:25, tab:'initials'},
-  {emoji:'📌', name:'포스트잇 떼기',            time:'10분', score:30},
-  {emoji:'📰', name:'신문지 오래 버티기 (결승)', time:'15분', score:35},
-];
-
-const OX = [
-  {q:'낙타의 혹에는 물이 들어 있다.', a:false, e:'지방 덩어리예요.'},
-  {q:'문어의 심장은 3개다.', a:true},
-  {q:'성인의 뼈는 보통 206개다.', a:true},
-  {q:'바나나는 나무에서 자란다.', a:false, e:'사실 거대한 "풀"이에요.'},
-  {q:'세종대왕은 조선의 4대 왕이다.', a:true},
-  {q:'달에서는 소리가 들리지 않는다.', a:true, e:'공기가 없어서요.'},
-  {q:'펭귄은 북극에 산다.', a:false, e:'대부분 남반구, 북극엔 없어요.'},
-  {q:'토마토는 식물학적으로 과일이다.', a:true},
-  {q:'세계에서 면적이 가장 큰 나라는 중국이다.', a:false, e:'러시아예요.'},
-  {q:'대한민국에서 가장 높은 산은 한라산이다.', a:true},
-  {q:'상어는 포유류다.', a:false, e:'어류예요.'},
-  {q:'거미는 다리가 6개인 곤충이다.', a:false, e:'다리 8개, 곤충 아니에요.'},
-  {q:'우리 몸에서 가장 큰 장기는 피부다.', a:true},
-  {q:'금은 물에 뜬다.', a:false, e:'물보다 훨씬 무거워요.'},
-  {q:'번개는 같은 장소에 두 번 칠 수 없다.', a:false, e:'칠 수 있어요.'},
-  {q:'지구에서 가장 가까운 별은 태양이다.', a:true},
-  {q:'한글은 세종대왕 때 만들어졌다.', a:true},
-  {q:'사람은 눈을 뜬 채로 재채기하기 어렵다.', a:true},
-  {q:'꿀벌은 침을 한 번 쏘면 죽는다.', a:true},
-  {q:'카카오(초콜릿 원료)는 나무 열매의 씨앗이다.', a:true},
-  {q:'[넌센스] 세상에서 가장 빠른 닭은 "후다닭"이다.', a:true},
-  {q:'[넌센스] 아몬드가 죽으면 "다이아몬드"가 된다.', a:true},
-  {q:'[넌센스] 왕이 넘어지면 "킹콩"이다.', a:true},
-  {q:'[넌센스] 병아리가 제일 좋아하는 약은 "삐약"이다.', a:true},
-  {q:'[넌센스] 우유가 넘어지면 "아야"라고 한다.', a:true},
-];
-
-const CHARADES = {  // 주제별 15개씩 통일
-  '🍕 음식': ['김밥','라면','떡볶이','치킨','피자','햄버거','삼겹살','냉면','붕어빵','팝콘','수박','짜장면','초밥','만두','아이스크림'],
-  '🐶 동물': ['원숭이','코끼리','기린','토끼','캥거루','펭귄','고릴라','뱀','닭','오리','돼지','말','고양이','강아지','악어'],
-  '💼 직업': ['의사','경찰','소방관','선생님','요리사','미용사','사진작가','가수','배우','야구선수','축구선수','승무원','군인','화가','지휘자'],
-  '🎬 영화': ['기생충','타이타닉','겨울왕국','범죄도시','부산행','극한직업','아바타','해리포터','어벤져스','명량','엑시트','국제시장','신과함께','스파이더맨','킹콩'],
-  '📜 속담·사자성어': ['누워서 떡 먹기','소 잃고 외양간 고치기','개구리 올챙이 적 생각 못 한다','우물 안 개구리','원숭이도 나무에서 떨어진다','티끌 모아 태산','등잔 밑이 어둡다','백지장도 맞들면 낫다','그림의 떡','배보다 배꼽이 크다','도토리 키 재기','하늘의 별 따기','소귀에 경 읽기','우공이산','적반하장'],
-  '🏅 스포츠': ['야구','축구','농구','배구','골프','수영','마라톤','컬링','양궁','태권도','스키','볼링','탁구','배드민턴','클라이밍'],
-};
-
-const INITIALS = {
-  '🍜 음식': [['ㄸㅂㅇ','떡볶이'],['ㅂㄱㄱ','불고기'],['ㅅㄱㅅ','삼겹살'],['ㅂㄷㅉㄱ','부대찌개'],['ㄱㅂ','김밥'],['ㅊㅋ','치킨'],['ㅈㅈㅁ','짜장면'],['ㄴㅁ','냉면'],['ㅂㅇㅂ','비빔밥'],['ㅁㅇㄱ','미역국']],
-  '🎬 영화': [['ㅂㅈㄷㅅ','범죄도시'],['ㄱㅅㅊ','기생충'],['ㄱㅎㅈㅇ','극한직업'],['ㅂㅅㅎ','부산행'],['ㅅㄱㅎㄲ','신과함께'],['ㄱㅇㅇㄱ','겨울왕국'],['ㅁㄹ','명량'],['ㅌㅇㅌㄴ','타이타닉']],
-  '📺 예능': [['ㄹㄴㅁ','런닝맨'],['ㅁㅎㄷㅈ','무한도전'],['ㄴㄹㅇㅌㅇ','놀라운 토요일'],['ㅇㅂㅎㄴ','아는 형님'],['ㅅㅅㅇㄱ','신서유기'],['ㅂㅁㄱㅇ','복면가왕'],['ㄹㄷㅇㅅㅌ','라디오스타'],['ㅅㅅㅅㄲ','삼시세끼']],
-  '🏠 생활/물건': [['ㅇㅊ','우산'],['ㄴㅈㄱ','냉장고'],['ㅈㅈㄹㅈ','전자레인지'],['ㅇㅇㅋ','에어컨'],['ㅊㅅㄱ','청소기'],['ㅅㅍㄱ','선풍기'],['ㅇㄱ','안경'],['ㅅㅁㅌㅍ','스마트폰'],['ㅅㅌㄱ','세탁기']],
-};
-
 /* ---------- state ---------- */
 const KEY='fss2026';
 const load=()=>{ try{return JSON.parse(localStorage.getItem(KEY))||{}}catch{return{}} };
@@ -286,15 +229,14 @@ function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.fl
 
 // generic Q -> reveal answer -> next  (OX & 초성). 출제 수 지정 + 랜덤 뽑기
 function makeQuiz(stageId, pool, renderAnswer){
-  let items=shuffle(pool), i=0, shown=false, showKey=false;
+  let items=shuffle(pool), i=0, shown=false;
   const el=document.getElementById(stageId);
   function reshuffle(n){ n=Math.max(1,Math.min(pool.length,n||pool.length)); items=shuffle(pool).slice(0,n); i=0; shown=false; draw(); }
   function draw(){
     const it=items[i];
     el.innerHTML=`
       <div class="ctrl">출제 수 <input type="number" class="cnt" min="1" max="${pool.length}" value="${items.length}"> / ${pool.length}개
-        <button class="btn g sm shuf">🔀 새로 뽑기</button>
-        <button class="btn g sm keyB">🔑 정답표${showKey?' 닫기':''}</button></div>
+        <button class="btn g sm shuf">🔀 새로 뽑기</button></div>
       <div class="badge">${it.badge}</div>
       <div class="qtext">${it.q}</div>
       <div class="answer ${shown?it.cls||'':''}">${shown?renderAnswer(it):''}</div>
@@ -304,13 +246,9 @@ function makeQuiz(stageId, pool, renderAnswer){
         <button class="btn g" id="prevB">◀ 이전</button>
         <button class="btn p" id="revB">${shown?'정답 숨기기':'정답 공개'}</button>
         <button class="btn g" id="nextB">다음 ▶</button>
-      </div>
-      ${showKey?`<div class="keylist"><div class="keyhead">🔑 진행자용 정답표 (빔에 안 띄우기)</div>${
-        items.map((x,n)=>`<div${n===i?' class="cur"':''}>${n+1}. ${x.q} <b>→ ${renderAnswer(x)}</b>${x.note?' <span class="hint">'+x.note+'</span>':''}</div>`).join('')
-      }</div>`:''}`;
+      </div>`;
     el.querySelector('.shuf').onclick=()=>reshuffle(+el.querySelector('.cnt').value);
     el.querySelector('.cnt').onchange=()=>reshuffle(+el.querySelector('.cnt').value);
-    el.querySelector('.keyB').onclick=()=>{ showKey=!showKey; draw(); };
     el.querySelector('#prevB').onclick=()=>{ i=(i-1+items.length)%items.length; shown=false; draw(); };
     el.querySelector('#nextB').onclick=()=>{ i=(i+1)%items.length; shown=false; draw(); };
     el.querySelector('#revB').onclick=()=>{ shown=!shown; draw(); };
