@@ -193,14 +193,15 @@ function renderSched(){
     const body = shown
       ? `<div class="body">${g.emoji} ${g.name} <span class="meta">· ${g.time} · ${g.score}점</span></div>`
       : `<div class="body"><span class="hidden-label">? ? ?</span></div>`;
-    const label = !shown ? '공개' : (g.tab ? '게임 열기 ▶' : '발표됨');
+    const label = !shown ? '공개' : (g.tab ? '게임 열기 ▶' : '숨기기');
     return `<div class="sched-item"><div class="no">${i+1}</div>${body}
-      <button class="btn ${shown&&!g.tab?'g':'p'} sm" data-i="${i}" ${shown&&!g.tab?'disabled style="opacity:.5"':''}>${label}</button></div>`;
+      <button class="btn ${shown&&!g.tab?'g':'p'} sm" data-i="${i}">${label}</button></div>`;
   }).join('');
   document.querySelectorAll('#sched button').forEach(btn=>btn.onclick=()=>{
     const i=+btn.dataset.i, g=GAMES[i];
-    if(!state.revealed[i]){ state.revealed[i]=true; save(state); renderSched(); } // 1번째: 공개만
-    else if(g.tab){ activate(g.tab); } // 2번째: 게임으로 이동
+    if(!state.revealed[i]){ state.revealed[i]=true; save(state); renderSched(); } // 1번째: 공개
+    else if(g.tab){ activate(g.tab); }                                            // 화면 게임: 이동
+    else { state.revealed[i]=false; save(state); renderSched(); }                 // 오프라인 게임: 다시 숨기기
   });
 }
 
