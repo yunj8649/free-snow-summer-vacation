@@ -4,7 +4,6 @@ const GAMES = [
   {emoji:'⭕❌', name:'OX 퀴즈',   time:'15분', score:20, tab:'ox'},
   {emoji:'🤸', name:'몸으로 말해요',            time:'30분', score:30, tab:'charades'},
   {emoji:'💡', name:'초성 맞추기',              time:'15분', score:25, tab:'initials'},
-  {emoji:'📌', name:'포스트잇 떼기',            time:'10분', score:30},
   {emoji:'📰', name:'신문지 오래 버티기 (결승)', time:'15분', score:35},
 ];
 
