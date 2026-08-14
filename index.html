@@ -57,6 +57,7 @@
   .qtext { font-size:2.6rem; font-weight:800; line-height:1.25; margin:10px 0; word-break:keep-all; }
   .answer { font-size:2.4rem; font-weight:800; margin-top:16px; min-height:2.6rem; }
   .answer.o { color:var(--ok); } .answer.x { color:var(--hot); }
+  .answer.big { font-size:5rem; font-weight:900; line-height:1; }
   .note { color:var(--mut); font-size:1.05rem; margin-top:6px; min-height:1.4rem; }
   .counter { color:var(--mut); margin-top:14px; }
   .cats { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom:8px; }
@@ -299,9 +300,8 @@ function makeQuiz(stageId, items, renderAnswer){
 
 // OX
 makeQuiz('oxStage', OX.map((o,idx)=>({
-  badge:`OX ${idx+1}`, q:o.q, note:o.e||'', cls:o.a?'o':'x',
-  _a:o.a, __render:o
-})), it=> it._a ? '⭕ O' : '❌ X');
+  badge:`OX ${idx+1}`, q:o.q, note:o.e||'', cls:o.a?'o big':'x big', _a:o.a
+})), it=> it._a ? 'O' : 'X');
 
 // 초성 (flatten categories)
 const inFlat=[];
