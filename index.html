@@ -48,7 +48,9 @@
   .teamEdit .row { align-items:center; }
   .sb th, .sb td { text-align:center; padding:8px 6px; }
   .sb td:first-child, .sb th:first-child { text-align:left; }
-  .sb input { width:56px; text-align:center; padding:6px; }
+  .sb input[type=number] { width:56px; text-align:center; padding:6px; }
+  .sb input[type=checkbox] { width:auto; padding:0; margin:0 3px 0 0; transform:scale(1.2); accent-color:var(--ok); }
+  .wincheck { display:inline-flex; align-items:center; font-size:.72rem; color:var(--mut); margin-top:5px; cursor:pointer; white-space:nowrap; font-weight:700; }
   .total { font-weight:900; font-size:1.15rem; color:var(--accent2); }
   .rank1 td:first-child::before { content:"🥇 "; }
   .rank2 td:first-child::before { content:"🥈 "; }
@@ -213,19 +215,24 @@ function renderScore(){
   ranked.forEach((o,idx)=>{ if(o.t!==prev){r=idx+1;prev=o.t;} rankOf[o.i]=o.t>0?r:0; });
   document.getElementById('sbBody').innerHTML=state.teams.map((t,ti)=>
     `<tr class="rank${rankOf[ti]}"><td>${t.name}</td>${GAMES.map((g,gi)=>
-       `<td><input type="number" min="0" max="${g.score}" value="${state.scores[ti][gi]||0}"
-          data-t="${ti}" data-g="${gi}"></td>`).join('')}<td class="total">${totals[ti]}</td></tr>`
+       `<td><input type="number" min="0" max="${g.score}" value="${state.scores[ti][gi]||0}" data-t="${ti}" data-g="${gi}">
+          <label class="wincheck"><input type="checkbox" data-t="${ti}" data-g="${gi}" ${(+state.scores[ti][gi]||0)===g.score?'checked':''}>이김</label></td>`
+       ).join('')}<td class="total">${totals[ti]}</td></tr>`
   ).join('');
-  document.querySelectorAll('.sb input').forEach(inp=>inp.oninput=()=>{
+  document.querySelectorAll('.sb input[type=number]').forEach(inp=>inp.oninput=()=>{
     let v=Math.max(0,+inp.value||0); const cap=GAMES[+inp.dataset.g].score;
     if(v>cap){v=cap; inp.value=cap;}
     state.scores[+inp.dataset.t][+inp.dataset.g]=v; save(state); renderScore();
+  });
+  document.querySelectorAll('.sb input[type=checkbox]').forEach(cb=>cb.onchange=()=>{
+    state.scores[+cb.dataset.t][+cb.dataset.g] = cb.checked ? GAMES[+cb.dataset.g].score : 0;
+    save(state); renderScore();
   });
   const max=Math.max(...totals);
   const done=state.revealed[GAMES.length-1] && max>0;
   document.getElementById('winner').innerHTML =
     max>0 ? `${done?'🏆 우승: ':'현재 1위: '}${state.teams.map((t,i)=>totals[i]===max?t.name:'').filter(Boolean).join(', ')} (${max}점)` : '';
-  document.getElementById('scoreHint').textContent='칸에 점수를 입력하면 자동 합산·정렬돼요. 배점 상한까지만 입력됩니다.';
+  document.getElementById('scoreHint').textContent='점수를 직접 입력하거나 "이김"을 체크하면 그 게임 배점만큼 자동 반영돼요.';
 }
 
 /* ---------- quiz helpers ---------- */
