@@ -149,6 +149,7 @@ function activate(id){
   const isGame=['ox','charades','initials'].includes(id); // 게임 화면이면 상단 숨겨 몰입
   document.querySelector('header').style.display=isGame?'none':'';
   document.querySelector('nav').style.display=isGame?'none':'';
+  document.querySelector('footer').style.display=id==='schedule'?'':'none'; // 초기화는 메인에서만
   window.scrollTo(0,0);
   if(id==='score') renderScore();
 }
