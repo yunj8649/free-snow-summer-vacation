@@ -71,3 +71,4 @@ a.btn { text-decoration:none; display:inline-block; }
 .cats button.on { background:linear-gradient(135deg,var(--teal),var(--sky)); color:#fff; border-color:#fff; }
 .nav2 { display:flex; gap:10px; justify-content:center; margin-top:18px; }
 .back-link { margin-bottom:8px; }
+.btn[disabled] { opacity:.45; cursor:default; box-shadow:none; }
