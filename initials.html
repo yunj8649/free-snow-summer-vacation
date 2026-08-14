@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>초성 맞추기</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="gamepage">
+  <div class="card">
+    <a class="btn g sm back-link" href="./index.html">← 진행 순서</a>
+    <div class="stage" id="inStage"></div>
+  </div>
+</main>
+<script src="data.js"></script>
+<script src="game.js"></script>
+<script>
+  const inFlat=[];
+  for(const [cat,list] of Object.entries(INITIALS)) list.forEach(([q,a])=>inFlat.push({badge:cat, q, note:'', answer:a}));
+  makeQuiz('inStage', inFlat, it=> it.answer);
+</script>
+</body>
+</html>
