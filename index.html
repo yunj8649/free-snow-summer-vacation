@@ -112,6 +112,10 @@
       <p class="hint" id="scoreHint"></p>
     </div>
   </section>
+
+  <footer style="text-align:center; padding:10px 0 30px">
+    <button class="btn g sm" id="resetAll">🗑 데이터 초기화 (팀·점수·공개상태)</button>
+  </footer>
 </main>
 
 <script>
@@ -185,6 +189,9 @@ function activate(id){
 }
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>activate(b.dataset.tab));
 document.querySelectorAll('.back').forEach(b=>b.onclick=()=>activate('schedule'));
+document.getElementById('resetAll').onclick=()=>{
+  if(confirm('팀·점수·공개 상태를 모두 초기화할까요?')){ localStorage.removeItem(KEY); location.reload(); }
+};
 
 /* ---------- schedule (reveal one by one -> jump to game) ---------- */
 function renderSched(){
