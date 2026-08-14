@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>정답표 (진행자용)</title>
+<style>
+  :root { --bg:#0f1220; --card:#1a1f36; --line:#2c3350; --fg:#eef1ff; --mut:#9aa3c7; --accent:#ffcc4d; --ok:#4ade80; --hot:#ff6b6b; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif; background:var(--bg); color:var(--fg); font-size:17px; }
+  header { text-align:center; padding:20px 12px 6px; }
+  h1 { margin:0; font-size:1.5rem; }
+  .warn { color:var(--hot); font-size:.9rem; margin-top:6px; }
+  main { max-width:760px; margin:0 auto; padding:8px 14px 60px; }
+  h2 { font-size:1.2rem; margin:22px 0 8px; padding-bottom:6px; border-bottom:2px solid var(--accent); }
+  h3 { font-size:1rem; color:var(--accent); margin:16px 0 6px; }
+  ol { margin:0; padding-left:26px; }
+  li { padding:5px 0; border-bottom:1px solid var(--line); line-height:1.4; }
+  .q { color:var(--fg); }
+  .a { font-weight:800; color:var(--accent); }
+  .o { color:var(--ok); font-weight:900; }
+  .x { color:var(--hot); font-weight:900; }
+  .note { color:var(--mut); font-size:.9rem; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:6px 18px; }
+  .grid div { padding:4px 0; border-bottom:1px solid var(--line); }
+  a.home { color:var(--mut); }
+</style>
+</head>
+<body>
+<header>
+  <h1>🔑 정답표 (진행자용)</h1>
+  <div class="warn">⚠️ 이 페이지는 진행자만! 빔프로젝터에 띄우지 마세요.</div>
+  <div style="margin-top:6px"><a class="home" href="./index.html">← 게임 화면으로</a></div>
+</header>
+<main id="app"></main>
+
+<script src="data.js"></script>
+<script>
+const app=document.getElementById('app');
+let html='';
+
+// OX
+html+='<h2>⭕❌ OX 퀴즈</h2><ol>';
+OX.forEach(o=>{
+  html+=`<li><span class="q">${o.q}</span> <span class="${o.a?'o':'x'}">${o.a?'O':'X'}</span>`
+      + (o.e?` <span class="note">(${o.e})</span>`:'') + '</li>';
+});
+html+='</ol>';
+
+// 초성
+html+='<h2>💡 초성 맞추기</h2>';
+for(const [cat,list] of Object.entries(INITIALS)){
+  html+=`<h3>${cat}</h3><ol>`;
+  list.forEach(([q,a])=>{ html+=`<li><span class="q">${q}</span> → <span class="a">${a}</span></li>`; });
+  html+='</ol>';
+}
+
+// 몸으로 말해요 (제시어 = 정답)
+html+='<h2>🤸 몸으로 말해요 (제시어)</h2>';
+for(const [cat,list] of Object.entries(CHARADES)){
+  html+=`<h3>${cat}</h3><div class="grid">${list.map(w=>`<div>${w}</div>`).join('')}</div>`;
+}
+
+app.innerHTML=html;
+</script>
+</body>
+</html>
