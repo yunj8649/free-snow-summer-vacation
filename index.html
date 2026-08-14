@@ -79,7 +79,7 @@
 <header>
   <img class="logo" src="./logo.jpg" alt="프리스노우 로고">
   <h1>🏖️ 여름 정모 레크레이션 ☀️</h1>
-  <div class="sub">Free Snow Summer · 총점 150점 · 팀 대항전</div>
+  <div class="sub">Free Snow Summer · 총점 120점 · 팀 대항전</div>
 </header>
 <nav>
   <button data-tab="schedule" class="active">진행 순서</button>
@@ -132,7 +132,7 @@
 <script src="data.js"></script>
 <script>
 /* ---------- state ---------- */
-const KEY='fss2026';
+const KEY='fss2026b'; // 게임 구성 변경으로 저장키 갱신(기존 저장값 초기화)
 const load=()=>{ try{return JSON.parse(localStorage.getItem(KEY))||{}}catch{return{}} };
 const save=s=>localStorage.setItem(KEY,JSON.stringify(s));
 let state=load(); // {teams:[{name,members[]}], scores:[[..6]], revealed:[bool x6]}
