@@ -199,8 +199,8 @@ function renderSched(){
   }).join('');
   document.querySelectorAll('#sched button').forEach(btn=>btn.onclick=()=>{
     const i=+btn.dataset.i, g=GAMES[i];
-    state.revealed[i]=true; save(state); renderSched();
-    if(g.tab) activate(g.tab); // 화면 있는 게임이면 바로 이동
+    if(!state.revealed[i]){ state.revealed[i]=true; save(state); renderSched(); } // 1번째: 공개만
+    else if(g.tab){ activate(g.tab); } // 2번째: 게임으로 이동
   });
 }
 
@@ -212,18 +212,13 @@ function buildTeamInputs(count, existing){
     const t=existing&&existing[i];
     const div=document.createElement('div');
     div.className='teamEdit';
-    div.innerHTML=`<div class="row"><input class="tname" style="max-width:220px" value="${t?t.name:(i+1)+'팀'}"></div>
-      <label>팀원 (한 줄에 한 명 또는 쉼표)</label>
-      <textarea class="tmem">${t?t.members.join('\n'):''}</textarea>`;
+    div.innerHTML=`<div class="row"><input class="tname" style="max-width:260px" value="${t?t.name:(i+1)+'팀'}"></div>`;
     el.appendChild(div);
   }
 }
 function collectTeams(){
   const rows=document.querySelectorAll('#teamEdit .teamEdit');
-  return [...rows].map(r=>({
-    name:r.querySelector('.tname').value.trim()||'팀',
-    members:r.querySelector('.tmem').value.split(/[\n,]/).map(s=>s.trim()).filter(Boolean),
-  }));
+  return [...rows].map(r=>({ name:r.querySelector('.tname').value.trim()||'팀' }));
 }
 document.getElementById('buildTeams').onclick=()=>{
   const n=Math.max(2,Math.min(12,+document.getElementById('teamCount').value||2));
@@ -236,8 +231,7 @@ document.getElementById('saveTeams').onclick=()=>{
   state.teams=teams;
   state.scores=teams.map((_,i)=> old[i] ? old[i] : GAMES.map(()=>0));
   save(state);
-  const total=teams.reduce((s,t)=>s+t.members.length,0);
-  document.getElementById('teamMeta').textContent=`저장됨 · ${teams.length}팀 · 총 ${total}명`;
+  document.getElementById('teamMeta').textContent=`저장됨 · ${teams.length}팀`;
   renderScore();
 };
 
