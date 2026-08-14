@@ -1,7 +1,7 @@
 /* 여름 정모 레크레이션 - 문제/정답 데이터 (index.html, answers.html 공용) */
 const GAMES = [
   {emoji:'🎯', name:'나이를 맞춰라',            time:'10분', score:10},
-  {emoji:'⭕❌', name:'OX 퀴즈 (상식+넌센스)',   time:'15분', score:20, tab:'ox'},
+  {emoji:'⭕❌', name:'OX 퀴즈',   time:'15분', score:20, tab:'ox'},
   {emoji:'🤸', name:'몸으로 말해요',            time:'30분', score:30, tab:'charades'},
   {emoji:'💡', name:'초성 맞추기',              time:'15분', score:25, tab:'initials'},
   {emoji:'📌', name:'포스트잇 떼기',            time:'10분', score:30},
