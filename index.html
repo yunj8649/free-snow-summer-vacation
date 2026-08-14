@@ -144,6 +144,9 @@ const CHEER_SCORE=10; // 📣 응원(분위기) 보너스 최대 점수
 function activate(id){
   document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active', x.dataset.tab===id));
   document.querySelectorAll('section').forEach(x=>x.classList.toggle('active', x.id===id));
+  const isGame=['ox','charades','initials'].includes(id); // 게임 화면이면 상단 숨겨 몰입
+  document.querySelector('header').style.display=isGame?'none':'';
+  document.querySelector('nav').style.display=isGame?'none':'';
   window.scrollTo(0,0);
   if(id==='score') renderScore();
 }
