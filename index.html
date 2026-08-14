@@ -135,8 +135,10 @@
 const KEY='fss2026b'; // 게임 구성 변경으로 저장키 갱신(기존 저장값 초기화)
 const load=()=>{ try{return JSON.parse(localStorage.getItem(KEY))||{}}catch{return{}} };
 const save=s=>localStorage.setItem(KEY,JSON.stringify(s));
-let state=load(); // {teams:[{name,members[]}], scores:[[..6]], revealed:[bool x6]}
+let state=load(); // {teams:[{name}], scores:[[..게임수]], cheer:[숫자], revealed:[bool]}
 if(!state.revealed) state.revealed=GAMES.map(()=>false);
+if(!state.cheer) state.cheer=[];
+const CHEER_SCORE=10; // 📣 응원(분위기) 보너스 최대 점수
 
 /* ---------- tabs ---------- */
 function activate(id){
@@ -196,6 +198,7 @@ document.getElementById('saveTeams').onclick=()=>{
   const old=state.scores||[];
   state.teams=teams;
   state.scores=teams.map((_,i)=> old[i] ? old[i] : GAMES.map(()=>0));
+  const oldC=state.cheer||[]; state.cheer=teams.map((_,i)=> +oldC[i]||0);
   save(state);
   document.getElementById('teamMeta').textContent=`저장됨 · ${teams.length}팀`;
   renderScore();
@@ -209,8 +212,8 @@ function renderScore(){
     document.getElementById('winner').innerHTML=''; return; }
   no.style.display='none';
   document.getElementById('sbHead').innerHTML=
-    `<tr><th>팀</th>${GAMES.map(g=>`<th>${g.emoji}<br><span class="hint">${g.score}</span></th>`).join('')}<th>합계</th></tr>`;
-  const totals=state.teams.map((_,ti)=>state.scores[ti].reduce((a,b)=>a+(+b||0),0));
+    `<tr><th>팀</th>${GAMES.map(g=>`<th>${g.emoji}<br><span class="hint">${g.score}</span></th>`).join('')}<th>📣<br><span class="hint">응원 ${CHEER_SCORE}</span></th><th>합계</th></tr>`;
+  const totals=state.teams.map((_,ti)=>state.scores[ti].reduce((a,b)=>a+(+b||0),0)+(+state.cheer[ti]||0));
   const ranked=[...totals].map((t,i)=>({t,i})).sort((a,b)=>b.t-a.t);
   const rankOf={}; let prev=null,r=0;
   ranked.forEach((o,idx)=>{ if(o.t!==prev){r=idx+1;prev=o.t;} rankOf[o.i]=o.t>0?r:0; });
@@ -218,16 +221,24 @@ function renderScore(){
     `<tr class="rank${rankOf[ti]}"><td>${t.name}</td>${GAMES.map((g,gi)=>
        `<td><input type="number" min="0" max="${g.score}" value="${state.scores[ti][gi]||0}" data-t="${ti}" data-g="${gi}">
           <label class="wincheck"><input type="checkbox" data-t="${ti}" data-g="${gi}" ${(+state.scores[ti][gi]||0)===g.score?'checked':''}>이김</label></td>`
-       ).join('')}<td class="total">${totals[ti]}</td></tr>`
+       ).join('')}<td><input type="number" class="cheer" min="0" max="${CHEER_SCORE}" value="${+state.cheer[ti]||0}" data-t="${ti}">
+          <label class="wincheck"><input type="checkbox" class="cheer" data-t="${ti}" ${(+state.cheer[ti]||0)===CHEER_SCORE?'checked':''}>만점</label></td><td class="total">${totals[ti]}</td></tr>`
   ).join('');
-  document.querySelectorAll('.sb input[type=number]').forEach(inp=>inp.oninput=()=>{
+  document.querySelectorAll('.sb input[type=number]:not(.cheer)').forEach(inp=>inp.oninput=()=>{
     let v=Math.max(0,+inp.value||0); const cap=GAMES[+inp.dataset.g].score;
     if(v>cap){v=cap; inp.value=cap;}
     state.scores[+inp.dataset.t][+inp.dataset.g]=v; save(state); renderScore();
   });
-  document.querySelectorAll('.sb input[type=checkbox]').forEach(cb=>cb.onchange=()=>{
+  document.querySelectorAll('.sb input[type=checkbox]:not(.cheer)').forEach(cb=>cb.onchange=()=>{
     state.scores[+cb.dataset.t][+cb.dataset.g] = cb.checked ? GAMES[+cb.dataset.g].score : 0;
     save(state); renderScore();
+  });
+  document.querySelectorAll('.sb input.cheer[type=number]').forEach(inp=>inp.oninput=()=>{
+    let v=Math.max(0,Math.min(CHEER_SCORE,+inp.value||0)); inp.value=v;
+    state.cheer[+inp.dataset.t]=v; save(state); renderScore();
+  });
+  document.querySelectorAll('.sb input.cheer[type=checkbox]').forEach(cb=>cb.onchange=()=>{
+    state.cheer[+cb.dataset.t]= cb.checked?CHEER_SCORE:0; save(state); renderScore();
   });
   const max=Math.max(...totals);
   const done=GAMES.every((g,gi)=>state.teams.some((_,ti)=>(+state.scores[ti][gi]||0)>0)); // 모든 게임에 점수 반영됨
