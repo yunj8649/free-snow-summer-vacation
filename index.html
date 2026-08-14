@@ -4,78 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>여름 정모 레크레이션</title>
-<style>
-  :root { --card:#ffffff; --line:#cfeaf7; --ink:#0e3a52; --mut:#5487a3;
-          --accent:#ffb703; --accent2:#ff9e00; --hot:#ef476f; --ok:#06a86b; --teal:#0fb5a6; --sky:#2aa9e0; }
-  * { box-sizing:border-box; }
-  body { margin:0; font-family:system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif; color:var(--ink); font-size:18px;
-         min-height:100vh; background-attachment:fixed;
-         background:linear-gradient(165deg,#4fc0f3 0%, #9adcfb 38%, #d8f3ff 66%, #fff2c2 100%); }
-  header { text-align:center; padding:22px 12px 4px; }
-  .logo { width:118px; height:118px; object-fit:cover; border-radius:50%; border:4px solid #fff;
-    box-shadow:0 8px 22px rgba(14,58,82,.28); background:#fff; }
-  h1 { margin:10px 0 0; font-size:2rem; letter-spacing:-.5px; color:#0e3a52; text-shadow:0 2px 0 #fff, 0 3px 10px rgba(255,255,255,.6); }
-  .sub { color:#0e3a52; opacity:.75; margin-top:4px; font-weight:600; }
-  nav { display:flex; gap:8px; justify-content:center; padding:14px 8px; flex-wrap:wrap; }
-  nav button { font-size:1rem; padding:10px 18px; border:2px solid #fff; background:rgba(255,255,255,.7);
-    color:var(--ink); border-radius:999px; cursor:pointer; font-weight:700; box-shadow:0 3px 10px rgba(14,58,82,.12); }
-  nav button.active { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#5a3a00; border-color:#fff; }
-  main { max-width:980px; margin:0 auto; padding:10px 16px 60px; }
-  section { display:none; } section.active { display:block; }
-  .card { background:var(--card); border:none; border-radius:20px; padding:18px; margin-bottom:16px;
-    box-shadow:0 10px 30px rgba(14,58,82,.14); }
-  table { width:100%; border-collapse:collapse; }
-  th,td { padding:11px 9px; border-bottom:1px solid var(--line); text-align:left; }
-  th { color:var(--mut); font-weight:700; font-size:.9rem; }
-  textarea, input { background:#f2fbff; color:var(--ink); border:2px solid var(--line);
-    border-radius:12px; padding:10px; font-size:1rem; width:100%; font-family:inherit; }
-  textarea { min-height:80px; resize:vertical; }
-  label { display:block; color:var(--mut); margin:6px 0 3px; font-size:.9rem; font-weight:600; }
-  .row { display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; }
-  .btn { font-size:1rem; padding:11px 20px; border:none; border-radius:12px; cursor:pointer; font-weight:800; }
-  .btn.p { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#5a3a00; box-shadow:0 4px 12px rgba(255,158,0,.35); }
-  .btn.g { background:#eaf6fc; color:var(--ink); border:2px solid var(--line); }
-  .btn.sm { padding:7px 14px; font-size:.9rem; }
-  .hint { color:var(--mut); font-size:.9rem; }
-  /* schedule */
-  .sched-item { display:flex; align-items:center; gap:14px; padding:13px 4px; border-bottom:1px solid var(--line); }
-  .sched-item .no { font-size:1.3rem; font-weight:900; color:var(--sky); width:30px; text-align:center; }
-  .sched-item .body { flex:1; font-size:1.25rem; font-weight:600; }
-  .sched-item .meta { color:var(--mut); font-size:.95rem; }
-  .hidden-label { color:#9cc6dc; letter-spacing:4px; }
-  /* teams / scoreboard */
-  .teamEdit { border:2px solid var(--line); border-radius:12px; padding:12px; margin-bottom:10px; background:#f7fdff; }
-  .teamEdit .row { align-items:center; }
-  .sb th, .sb td { text-align:center; padding:8px 6px; }
-  .sb td:first-child, .sb th:first-child { text-align:left; }
-  .sb input[type=number] { width:56px; text-align:center; padding:6px; }
-  .sb input[type=checkbox] { width:auto; padding:0; margin:0 3px 0 0; transform:scale(1.2); accent-color:var(--ok); }
-  .wincheck { display:inline-flex; align-items:center; font-size:.72rem; color:var(--mut); margin-top:5px; cursor:pointer; white-space:nowrap; font-weight:700; }
-  .total { font-weight:900; font-size:1.15rem; color:var(--accent2); }
-  .rank1 td:first-child::before { content:"🥇 "; }
-  .rank2 td:first-child::before { content:"🥈 "; }
-  .rank3 td:first-child::before { content:"🥉 "; }
-  .win { text-align:center; font-size:1.5rem; padding:26px 0; font-weight:800; color:var(--accent2); }
-  .win:empty { padding:0; }
-  /* quiz stage */
-  #ox.active, #charades.active, #initials.active { display:flex; align-items:center; justify-content:center; min-height:calc(100vh - 40px); }
-  #ox .card, #charades .card, #initials .card { width:100%; }
-  .stage { text-align:center; padding:22px 12px; }
-  .badge { display:inline-block; background:linear-gradient(135deg,var(--teal),var(--sky)); color:#fff; border-radius:999px;
-    padding:7px 18px; font-size:1rem; font-weight:800; margin-bottom:14px; box-shadow:0 4px 12px rgba(15,181,166,.3); }
-  .qtext { font-size:2.6rem; font-weight:800; line-height:1.25; margin:48px 0; word-break:keep-all; min-height:3rem; color:var(--ink); }
-  .qtext .drawB { font-size:1.5rem; padding:18px 36px; }
-  .ctrl { display:flex; gap:8px; align-items:center; justify-content:center; flex-wrap:wrap; color:var(--mut); font-size:.9rem; margin-bottom:6px; }
-  .ctrl input { width:64px; text-align:center; padding:5px; }
-  .answer { font-size:2.4rem; font-weight:800; margin-top:16px; min-height:2.6rem; }
-  .answer.o { color:var(--ok); } .answer.x { color:var(--hot); }
-  .answer.big { font-size:5rem; font-weight:900; line-height:1; }
-  .note { color:var(--mut); font-size:1.05rem; margin-top:6px; min-height:1.4rem; }
-  .counter { color:var(--mut); margin-top:14px; font-weight:600; }
-  .cats { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom:8px; }
-  .cats button.on { background:linear-gradient(135deg,var(--teal),var(--sky)); color:#fff; border-color:#fff; }
-  .nav2 { display:flex; gap:10px; justify-content:center; margin-top:18px; }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header>
@@ -111,10 +40,6 @@
     </div>
   </section>
 
-  <section id="ox"><div class="card"><button class="btn g sm back">← 진행 순서</button><div class="stage" id="oxStage"></div></div></section>
-  <section id="charades"><div class="card"><button class="btn g sm back">← 진행 순서</button><div class="stage" id="chStage"></div></div></section>
-  <section id="initials"><div class="card"><button class="btn g sm back">← 진행 순서</button><div class="stage" id="inStage"></div></div></section>
-
   <section id="score">
     <div class="card">
       <div id="noTeams" class="hint">먼저 <b>팀</b> 탭에서 팀을 저장해 주세요.</div>
@@ -146,15 +71,11 @@ const CHEER_SCORE=10; // 📣 응원(분위기) 보너스 최대 점수
 function activate(id){
   document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active', x.dataset.tab===id));
   document.querySelectorAll('section').forEach(x=>x.classList.toggle('active', x.id===id));
-  const isGame=['ox','charades','initials'].includes(id); // 게임 화면이면 상단 숨겨 몰입
-  document.querySelector('header').style.display=isGame?'none':'';
-  document.querySelector('nav').style.display=isGame?'none':'';
   document.querySelector('footer').style.display=id==='schedule'?'':'none'; // 초기화는 메인에서만
   window.scrollTo(0,0);
   if(id==='score') renderScore();
 }
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>activate(b.dataset.tab));
-document.querySelectorAll('.back').forEach(b=>b.onclick=()=>activate('schedule'));
 document.getElementById('resetAll').onclick=()=>{
   if(confirm('팀·점수·공개 상태를 모두 초기화할까요?')){ localStorage.removeItem(KEY); location.reload(); }
 };
@@ -173,7 +94,7 @@ function renderSched(){
   document.querySelectorAll('#sched button').forEach(btn=>btn.onclick=()=>{
     const i=+btn.dataset.i, g=GAMES[i];
     if(!state.revealed[i]){ state.revealed[i]=true; save(state); renderSched(); } // 1번째: 공개
-    else if(g.tab){ activate(g.tab); }                                            // 화면 게임: 이동
+    else if(g.tab){ location.href = g.tab + '.html'; }                            // 화면 게임: 해당 페이지로 이동
     else { state.revealed[i]=false; save(state); renderSched(); }                 // 오프라인 게임: 다시 숨기기
   });
 }
@@ -252,89 +173,6 @@ function renderScore(){
     (done && max>0) ? `🏆 우승: ${state.teams.map((t,i)=>totals[i]===max?t.name:'').filter(Boolean).join(', ')} (${max}점)` : '';
   document.getElementById('scoreHint').textContent='점수를 직접 입력하거나 "이김"을 체크하면 그 게임 배점만큼 자동 반영돼요.';
 }
-
-/* ---------- quiz helpers ---------- */
-function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
-
-// generic Q -> reveal answer -> next  (OX & 초성). 출제 수 지정 + 랜덤 뽑기
-function makeQuiz(stageId, pool, renderAnswer){
-  let items=shuffle(pool), i=0, shown=false;
-  const el=document.getElementById(stageId);
-  function reshuffle(n){ n=Math.max(1,Math.min(pool.length,n||pool.length)); items=shuffle(pool).slice(0,n); i=0; shown=false; draw(); }
-  function draw(){
-    const it=items[i];
-    el.innerHTML=`
-      <div class="ctrl">출제 수 <input type="number" class="cnt" min="1" max="${pool.length}" value="${items.length}"> / ${pool.length}개
-        <button class="btn g sm shuf">🔀 새로 뽑기</button></div>
-      <div class="badge">${it.badge}</div>
-      <div class="qtext">${it.q}</div>
-      <div class="answer ${shown?it.cls||'':''}">${shown?renderAnswer(it):''}</div>
-      <div class="note">${shown&&it.note?it.note:''}</div>
-      <div class="counter">${i+1} / ${items.length}</div>
-      <div class="nav2">
-        <button class="btn g" id="prevB">◀ 이전</button>
-        <button class="btn p" id="revB">${shown?'정답 숨기기':'정답 공개'}</button>
-        <button class="btn g" id="nextB">다음 ▶</button>
-      </div>`;
-    el.querySelector('.shuf').onclick=()=>reshuffle(+el.querySelector('.cnt').value);
-    el.querySelector('.cnt').onchange=()=>reshuffle(+el.querySelector('.cnt').value);
-    el.querySelector('#prevB').onclick=()=>{ i=(i-1+items.length)%items.length; shown=false; draw(); };
-    el.querySelector('#nextB').onclick=()=>{ i=(i+1)%items.length; shown=false; draw(); };
-    el.querySelector('#revB').onclick=()=>{ shown=!shown; draw(); };
-  }
-  draw();
-}
-
-// OX
-makeQuiz('oxStage', OX.map(o=>({
-  badge:'OX', q:o.q, note:o.e||'', cls:o.a?'o big':'x big', _a:o.a
-})), it=> it._a ? 'O' : 'X');
-
-// 초성 (flatten categories)
-const inFlat=[];
-for(const [cat,list] of Object.entries(INITIALS))
-  list.forEach(([q,a])=>inFlat.push({badge:cat, q, note:'', answer:a}));
-makeQuiz('inStage', inFlat, it=> it.answer);
-
-/* ---------- 몸으로 말해요 (category -> words) ---------- */
-(function(){
-  const el=document.getElementById('chStage');
-  const cats=Object.keys(CHARADES);
-  const MAX=Math.min(...cats.map(c=>CHARADES[c].length)); // 주제마다 동일(15)
-  let cat=null, count=MAX, order=[], i=0;
-  function rebuild(){ order=cat?shuffle(CHARADES[cat]).slice(0,count):[]; i=0; draw(); }
-  function draw(){
-    el.innerHTML=`
-      <div class="cats">
-        ${cats.map(c=>`<button class="btn g sm ${c===cat?'on':''}" data-c="${c}">${c}</button>`).join('')}
-        <button class="btn p sm" id="rand">🎲 주제 랜덤 뽑기</button>
-      </div>
-      <div class="ctrl">제시어 수 <input type="number" class="cnt" min="1" max="${MAX}" value="${count}"> / ${MAX}개</div>
-      ${cat
-        ? `<div class="badge">${cat}</div>
-           <div class="qtext">${order[i]}</div>
-           <div class="counter">${i+1} / ${order.length}</div>
-           <div class="nav2">
-             <button class="btn g" id="p">◀ 이전</button>
-             <button class="btn p" id="n">다음 제시어 ▶</button>
-           </div>`
-        : `<div class="qtext" style="color:var(--mut); font-size:1.4rem">주제를 고르거나 🎲 랜덤 뽑기를 누르세요</div>`}
-      <p class="hint">제시어를 몸으로만 표현하세요! 화면은 연기자만 보게 하세요 🙈</p>`;
-    el.querySelectorAll('.cats button[data-c]').forEach(b=>b.onclick=()=>{ cat=b.dataset.c; rebuild(); });
-    el.querySelector('#rand').onclick=()=>{ cat=cats[Math.floor(Math.random()*cats.length)]; rebuild(); };
-    el.querySelector('.cnt').onchange=e=>{ count=Math.max(1,Math.min(MAX,+e.target.value||1)); rebuild(); };
-    if(cat){
-      el.querySelector('#p').onclick=()=>{ i=(i-1+order.length)%order.length; draw(); };
-      el.querySelector('#n').onclick=()=>{ i=(i+1)%order.length; draw(); };
-    }
-  }
-  draw();
-})();
-
-/* ---------- self-check ---------- */
-console.assert(OX.length===25,'OX should be 25');
-console.assert(inFlat.length===Object.values(INITIALS).reduce((s,l)=>s+l.length,0),'초성 flatten mismatch');
-(function(){ const ls=Object.values(CHARADES).map(l=>l.length); console.assert(new Set(ls).size===1,'주제별 제시어 수 불일치: '+ls); })();
 
 /* ---------- init ---------- */
 renderSched();
