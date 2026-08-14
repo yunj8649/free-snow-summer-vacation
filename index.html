@@ -54,7 +54,10 @@
   .stage { text-align:center; padding:22px 12px; }
   .badge { display:inline-block; background:#2c3350; color:var(--accent); border-radius:999px;
     padding:6px 16px; font-size:1rem; font-weight:700; margin-bottom:14px; }
-  .qtext { font-size:2.6rem; font-weight:800; line-height:1.25; margin:10px 0; word-break:keep-all; }
+  .qtext { font-size:2.6rem; font-weight:800; line-height:1.25; margin:48px 0; word-break:keep-all; min-height:3rem; }
+  .qtext .drawB { font-size:1.5rem; padding:18px 36px; }
+  .ctrl { display:flex; gap:8px; align-items:center; justify-content:center; flex-wrap:wrap; color:var(--mut); font-size:.9rem; margin-bottom:6px; }
+  .ctrl input { width:64px; text-align:center; padding:5px; }
   .answer { font-size:2.4rem; font-weight:800; margin-top:16px; min-height:2.6rem; }
   .answer.o { color:var(--ok); } .answer.x { color:var(--hot); }
   .answer.big { font-size:5rem; font-weight:900; line-height:1; }
@@ -124,7 +127,7 @@ const GAMES = [
   {emoji:'🎯', name:'나이를 맞춰라',            time:'10분', score:10},
   {emoji:'⭕❌', name:'OX 퀴즈 (상식+넌센스)',   time:'15분', score:20, tab:'ox'},
   {emoji:'🤸', name:'몸으로 말해요',            time:'30분', score:30, tab:'charades'},
-  {emoji:'💡', name:'초성 & 영화 제목 맞추기',  time:'15분', score:25, tab:'initials'},
+  {emoji:'💡', name:'초성 맞추기',              time:'15분', score:25, tab:'initials'},
   {emoji:'📌', name:'포스트잇 떼기',            time:'10분', score:30},
   {emoji:'📰', name:'신문지 오래 버티기 (결승)', time:'15분', score:35},
 ];
@@ -198,7 +201,7 @@ function renderSched(){
   document.getElementById('sched').innerHTML = GAMES.map((g,i)=>{
     const shown=state.revealed[i];
     const body = shown
-      ? `<div class="body">${g.emoji} ${g.name} <span class="meta">· ${g.time} · ${g.score}점</span></div>`
+      ? `<div class="body">${g.emoji} ${g.name}</div>`
       : `<div class="body"><span class="hidden-label">? ? ?</span></div>`;
     const label = !shown ? '공개' : (g.tab ? '게임 열기 ▶' : '숨기기');
     return `<div class="sched-item"><div class="no">${i+1}</div>${body}
@@ -276,13 +279,16 @@ function renderScore(){
 /* ---------- quiz helpers ---------- */
 function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 
-// generic Q -> reveal answer -> next  (OX & 초성)
-function makeQuiz(stageId, items, renderAnswer){
-  let i=0, shown=false;
+// generic Q -> reveal answer -> next  (OX & 초성). 출제 수 지정 + 랜덤 뽑기
+function makeQuiz(stageId, pool, renderAnswer){
+  let items=shuffle(pool), i=0, shown=false;
   const el=document.getElementById(stageId);
+  function reshuffle(n){ n=Math.max(1,Math.min(pool.length,n||pool.length)); items=shuffle(pool).slice(0,n); i=0; shown=false; draw(); }
   function draw(){
     const it=items[i];
     el.innerHTML=`
+      <div class="ctrl">출제 수 <input type="number" class="cnt" min="1" max="${pool.length}" value="${items.length}"> / ${pool.length}개
+        <button class="btn g sm shuf">🔀 새로 뽑기</button></div>
       <div class="badge">${it.badge}</div>
       <div class="qtext">${it.q}</div>
       <div class="answer ${shown?it.cls||'':''}">${shown?renderAnswer(it):''}</div>
@@ -293,6 +299,8 @@ function makeQuiz(stageId, items, renderAnswer){
         <button class="btn p" id="revB">${shown?'정답 숨기기':'정답 공개'}</button>
         <button class="btn g" id="nextB">다음 ▶</button>
       </div>`;
+    el.querySelector('.shuf').onclick=()=>reshuffle(+el.querySelector('.cnt').value);
+    el.querySelector('.cnt').onchange=()=>reshuffle(+el.querySelector('.cnt').value);
     el.querySelector('#prevB').onclick=()=>{ i=(i-1+items.length)%items.length; shown=false; draw(); };
     el.querySelector('#nextB').onclick=()=>{ i=(i+1)%items.length; shown=false; draw(); };
     el.querySelector('#revB').onclick=()=>{ shown=!shown; draw(); };
@@ -301,8 +309,8 @@ function makeQuiz(stageId, items, renderAnswer){
 }
 
 // OX
-makeQuiz('oxStage', OX.map((o,idx)=>({
-  badge:`OX ${idx+1}`, q:o.q, note:o.e||'', cls:o.a?'o big':'x big', _a:o.a
+makeQuiz('oxStage', OX.map(o=>({
+  badge:'OX', q:o.q, note:o.e||'', cls:o.a?'o big':'x big', _a:o.a
 })), it=> it._a ? 'O' : 'X');
 
 // 초성 (flatten categories)
@@ -315,23 +323,30 @@ makeQuiz('inStage', inFlat, it=> it.answer);
 (function(){
   const el=document.getElementById('chStage');
   const cats=Object.keys(CHARADES);
-  let cat=cats[0], order=[], i=0;
-  function pick(c){ cat=c; order=shuffle(CHARADES[c]); i=0; draw(); }
+  let cat=cats[0], count=CHARADES[cat].length, order=[], i=0, shown=false;
+  function rebuild(){ order=shuffle(CHARADES[cat]).slice(0,count); i=0; shown=false; draw(); }
+  function pick(c){ cat=c; count=Math.min(count, CHARADES[c].length); rebuild(); }
   function draw(){
+    const max=CHARADES[cat].length;
     el.innerHTML=`
       <div class="cats">${cats.map(c=>`<button class="btn g sm ${c===cat?'on':''}" data-c="${c}">${c}</button>`).join('')}</div>
-      <div class="qtext">${order[i]}</div>
+      <div class="ctrl">제시어 수 <input type="number" class="cnt" min="1" max="${max}" value="${order.length}"> / ${max}개</div>
+      ${shown
+        ? `<div class="qtext">${order[i]}</div>`
+        : `<div class="qtext"><button class="btn p drawB">🎲 제시어 뽑기</button></div>`}
       <div class="counter">${i+1} / ${order.length}</div>
       <div class="nav2">
         <button class="btn g" id="p">◀ 이전</button>
         <button class="btn p" id="n">다음 제시어 ▶</button>
       </div>
-      <p class="hint">제시어를 몸으로만 표현하세요! 화면은 연기자만 보게 하세요 🙈</p>`;
+      <p class="hint">🎲 뽑기를 누르면 제시어가 나와요. 화면은 연기자만 보게 하세요 🙈</p>`;
     el.querySelectorAll('.cats button').forEach(b=>b.onclick=()=>pick(b.dataset.c));
-    el.querySelector('#p').onclick=()=>{ i=(i-1+order.length)%order.length; draw(); };
-    el.querySelector('#n').onclick=()=>{ i=(i+1)%order.length; draw(); };
+    el.querySelector('.cnt').onchange=e=>{ count=Math.max(1,Math.min(max,+e.target.value||1)); rebuild(); };
+    const db=el.querySelector('.drawB'); if(db) db.onclick=()=>{ shown=true; draw(); };
+    el.querySelector('#p').onclick=()=>{ i=(i-1+order.length)%order.length; shown=false; draw(); };
+    el.querySelector('#n').onclick=()=>{ i=(i+1)%order.length; shown=false; draw(); };
   }
-  pick(cat);
+  rebuild();
 })();
 
 /* ---------- self-check ---------- */
