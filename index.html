@@ -58,6 +58,11 @@
   .qtext .drawB { font-size:1.5rem; padding:18px 36px; }
   .ctrl { display:flex; gap:8px; align-items:center; justify-content:center; flex-wrap:wrap; color:var(--mut); font-size:.9rem; margin-bottom:6px; }
   .ctrl input { width:64px; text-align:center; padding:5px; }
+  .keylist { text-align:left; margin-top:20px; border-top:1px solid var(--line); padding-top:12px; max-height:360px; overflow:auto; }
+  .keylist .keyhead { color:var(--hot); font-weight:700; margin-bottom:8px; }
+  .keylist > div { padding:6px 6px; border-bottom:1px solid var(--line); font-size:1rem; border-radius:6px; }
+  .keylist > div.cur { background:rgba(255,204,77,.15); }
+  .keylist b { color:var(--accent); }
   .answer { font-size:2.4rem; font-weight:800; margin-top:16px; min-height:2.6rem; }
   .answer.o { color:var(--ok); } .answer.x { color:var(--hot); }
   .answer.big { font-size:5rem; font-weight:900; line-height:1; }
@@ -281,14 +286,15 @@ function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.fl
 
 // generic Q -> reveal answer -> next  (OX & 초성). 출제 수 지정 + 랜덤 뽑기
 function makeQuiz(stageId, pool, renderAnswer){
-  let items=shuffle(pool), i=0, shown=false;
+  let items=shuffle(pool), i=0, shown=false, showKey=false;
   const el=document.getElementById(stageId);
   function reshuffle(n){ n=Math.max(1,Math.min(pool.length,n||pool.length)); items=shuffle(pool).slice(0,n); i=0; shown=false; draw(); }
   function draw(){
     const it=items[i];
     el.innerHTML=`
       <div class="ctrl">출제 수 <input type="number" class="cnt" min="1" max="${pool.length}" value="${items.length}"> / ${pool.length}개
-        <button class="btn g sm shuf">🔀 새로 뽑기</button></div>
+        <button class="btn g sm shuf">🔀 새로 뽑기</button>
+        <button class="btn g sm keyB">🔑 정답표${showKey?' 닫기':''}</button></div>
       <div class="badge">${it.badge}</div>
       <div class="qtext">${it.q}</div>
       <div class="answer ${shown?it.cls||'':''}">${shown?renderAnswer(it):''}</div>
@@ -298,9 +304,13 @@ function makeQuiz(stageId, pool, renderAnswer){
         <button class="btn g" id="prevB">◀ 이전</button>
         <button class="btn p" id="revB">${shown?'정답 숨기기':'정답 공개'}</button>
         <button class="btn g" id="nextB">다음 ▶</button>
-      </div>`;
+      </div>
+      ${showKey?`<div class="keylist"><div class="keyhead">🔑 진행자용 정답표 (빔에 안 띄우기)</div>${
+        items.map((x,n)=>`<div${n===i?' class="cur"':''}>${n+1}. ${x.q} <b>→ ${renderAnswer(x)}</b>${x.note?' <span class="hint">'+x.note+'</span>':''}</div>`).join('')
+      }</div>`:''}`;
     el.querySelector('.shuf').onclick=()=>reshuffle(+el.querySelector('.cnt').value);
     el.querySelector('.cnt').onchange=()=>reshuffle(+el.querySelector('.cnt').value);
+    el.querySelector('.keyB').onclick=()=>{ showKey=!showKey; draw(); };
     el.querySelector('#prevB').onclick=()=>{ i=(i-1+items.length)%items.length; shown=false; draw(); };
     el.querySelector('#nextB').onclick=()=>{ i=(i+1)%items.length; shown=false; draw(); };
     el.querySelector('#revB').onclick=()=>{ shown=!shown; draw(); };
