@@ -3,6 +3,9 @@
 (function(){
   const BKEY='fss_bgm', CUR='fss_bgm_cur', VKEY='fss_bgm_vol';
   function list(){ try{ return JSON.parse(localStorage.getItem(BKEY))||[]; }catch(e){ return []; } }
+  function parseT(s){ s=(s||'').trim(); if(!s) return null;
+    if(s.includes(':')){ const p=s.split(':').map(Number); return (p[0]||0)*60+(p[1]||0); }
+    const n=Number(s); return isNaN(n)?null:n; }
   let vol=parseFloat(localStorage.getItem(VKEY)); if(isNaN(vol)) vol=0.5;
   BGM.setVolume(vol);
 
@@ -22,10 +25,13 @@
       + (items.length
         ? items.map(x=>`<button class="bgmbar-item${cur===x.url?' on':''}" data-url="${(x.url||'').replace(/"/g,'&quot;')}">▶ ${x.label||'배경음'}</button>`).join('')
         : '<div class="bgmbar-empty">저장된 곡이 없어요.<br>🎵 BGM 탭에서 추가하세요.</div>')
-      + '<div class="bgmbar-skip"><button class="skip" data-d="-60">⏮ 1분</button><button class="skip" data-d="60">1분 ⏭</button></div>'
+      + '<div class="bgmbar-skip"><input class="skipN" type="number" min="1" value="60" title="건너뛸 초"><button class="skip" data-dir="-1">⏪</button><button class="skip" data-dir="1">⏩</button></div>'
+      + '<div class="bgmbar-skip"><input class="goto" placeholder="1:30 또는 90"><button class="gobtn">↧ 이동</button></div>'
       + `<div class="bgmbar-vol">🔊 <input type="range" class="vol" min="0" max="1" step="0.05" value="${vol}"></div>`;
     m.querySelectorAll('.bgmbar-item[data-url]').forEach(b=>b.onclick=()=>play(b.dataset.url));
-    m.querySelectorAll('.skip').forEach(b=>b.onclick=()=>BGM.seek(+b.dataset.d));
+    const skipN=()=>Math.max(1, +m.querySelector('.skipN').value||60);
+    m.querySelectorAll('.skip').forEach(b=>b.onclick=()=>BGM.seek((+b.dataset.dir)*skipN()));
+    m.querySelector('.gobtn').onclick=()=>{ const t=parseT(m.querySelector('.goto').value); if(t!=null) BGM.seekTo(t); };
     m.querySelector('.stop').onclick=()=>stop();
     m.querySelector('.vol').oninput=e=>{ vol=+e.target.value; localStorage.setItem(VKEY,vol); BGM.setVolume(vol); };
   }
