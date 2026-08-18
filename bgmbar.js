@@ -41,7 +41,7 @@
     m.querySelector('.stop').onclick=()=>stop();
     m.querySelector('.vol').oninput=e=>{ vol=+e.target.value; localStorage.setItem(VKEY,vol); BGM.setVolume(vol); };
   }
-  function play(url, start){ const id=BGM.ytId(url); if(!id) return; localStorage.setItem(CUR,url); dock.hidden=false; BGM.playYouTube(id,'bgmbar-holder', start); render(); }
+  function play(url, start){ const id=BGM.ytId(url); if(!id) return; localStorage.setItem(CUR,url); sessionStorage.setItem('bgm_playing',url); dock.hidden=false; BGM.playYouTube(id,'bgmbar-holder', start); render(); }
   function chapterSkip(dir){
     const url=localStorage.getItem(CUR); if(!url) return;
     const it=list().find(x=>x.url===url);
@@ -54,7 +54,7 @@
     BGM.seekTo(target.t); showNow(target.label);
   }
   function showNow(label){ const el=document.getElementById('bgmbar-now'); if(el) el.textContent=label?('▶ '+label):''; }
-  function stop(){ BGM.select('off'); localStorage.removeItem(CUR); dock.hidden=true; render(); }
+  function stop(){ BGM.select('off'); localStorage.removeItem(CUR); sessionStorage.removeItem('bgm_playing'); dock.hidden=true; render(); }
   bar.querySelector('#bgmbar-toggle').onclick=()=>{ const m=menu(); m.hidden=!m.hidden; if(!m.hidden) render(); };
 
   window.bgmbarPlay=play; window.bgmbarStop=stop; window.bgmbarRefresh=render;
@@ -70,7 +70,15 @@
     el.textContent = cur.label ? ('▶ '+cur.label) : '';
   }, 1000);
 
-  // 새로고침 시 자동재생 안 함. 이전 선택 표시도 지움(재생 중인 것만 강조)
-  localStorage.removeItem(CUR);
+  // 화면 이동이면 이어서 재생, 수동 새로고침이면 재생 안 함
+  const navEntry = (performance.getEntriesByType && performance.getEntriesByType('navigation')[0]) || null;
+  const isReload = navEntry ? navEntry.type==='reload' : false;
+  const playing = sessionStorage.getItem('bgm_playing');
+  if(playing && !isReload){
+    const id=BGM.ytId(playing);
+    if(id){ localStorage.setItem(CUR,playing); dock.hidden=false; try{ BGM.playYouTube(id,'bgmbar-holder'); }catch(e){} }
+  } else {
+    sessionStorage.removeItem('bgm_playing'); localStorage.removeItem(CUR);
+  }
   render();
 })();
