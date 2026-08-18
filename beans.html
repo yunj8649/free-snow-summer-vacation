@@ -20,8 +20,15 @@
   const NS='http://www.w3.org/2000/svg';
   const el=document.getElementById('beanStage');
   const COLORS=['#ef476f','#0fb5a6','#ff9e00','#2aa9e0','#8338ec','#06a86b','#f15bb5','#3a86ff','#fb5607','#118ab2'];
+  const TOOLS=[
+    {e:'🥢',n:'쇠젓가락'},{e:'🥢',n:'쇠젓가락'},
+    {e:'🎋',n:'장대 젓가락'},{e:'🎋',n:'장대 젓가락'},
+    {e:'🦀',n:'집게'},{e:'🦀',n:'집게'},
+    {e:'🍢',n:'이쑤시개'},{e:'🍢',n:'이쑤시개'},
+    {e:'🌳',n:'나무젓가락'},{e:'🌳',n:'나무젓가락'},
+  ];
   const colW=64, rowH=34, padX=34, lineTop=60;
-  let n=6, rungs=[], res=[], svg=null, revealed={};
+  let n=TOOLS.length, rungs=[], res=[], svg=null, revealed={};
   function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
   function xOf(c){ return padX + c*colW; }
   function rowY(r){ return lineTop+26 + r*rowH; }
@@ -34,7 +41,7 @@
       for(let i=0;i<n-1;i++){ row[i]=(!row[i-1] && Math.random()<0.45); }
       rungs.push(row);
     }
-    res=shuffle(Array.from({length:n},(_,i)=>i+1));
+    res=shuffle(TOOLS).slice(0,n);
     revealed={};
   }
   function trace(c){
@@ -51,14 +58,14 @@
     const W=padX*2 + (n-1)*colW, H=bottomY()+38;
     el.innerHTML=`
       <div class="badge">🥢 콩 옮기기</div>
-      <div class="ctrl">인원 수 <input type="number" class="cnt" min="1" max="16" value="${n}"> 명
+      <div class="ctrl">인원 수 <input type="number" class="cnt" min="1" max="${TOOLS.length}" value="${n}"> 명
         <button class="btn p sm gen">🎲 새 사다리</button>
         <button class="btn g sm all">👀 전체 공개</button></div>
       <div class="laddwrap" style="overflow-x:auto; padding:8px 0;">
         <svg id="ladd" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="max-width:100%; height:auto;"></svg>
       </div>
       <div id="laddres" class="hint" style="min-height:1.4rem; font-weight:700; color:var(--ink)"></div>
-      <p class="hint">위쪽 참가자를 누르면 사다리를 타고 내려가 젓가락 번호가 공개돼요. 🎲로 새 사다리!</p>`;
+      <p class="hint">위쪽 참가자를 누르면 사다리를 타고 내려가 젓가락 종류가 공개돼요. 🥢쇠 · 🎋장대 · 🦀집게 · 🍢이쑤시개 · 🌳나무 (각 2세트) · 🎲로 새 사다리!</p>`;
     svg=el.querySelector('#ladd');
     // 세로줄
     for(let c=0;c<n;c++){ line(xOf(c),lineTop,xOf(c),bottomY(),'#cfeaf7',4); }
@@ -67,9 +74,9 @@
     // 위 참가자 마커 / 아래 젓가락
     for(let c=0;c<n;c++){
       chip(xOf(c),lineTop,'#2aa9e0',String(c+1),true,c);
-      chip(xOf(c),bottomY(),'#ffb703','🥢'+res[c],false,c);
+      chip(xOf(c),bottomY(),'#ffb703',res[c].e,false,c);
     }
-    el.querySelector('.cnt').onchange=e=>{ n=Math.max(1,Math.min(16,+e.target.value||1)); gen(); draw(); };
+    el.querySelector('.cnt').onchange=e=>{ n=Math.max(1,Math.min(TOOLS.length,+e.target.value||1)); gen(); draw(); };
     el.querySelector('.gen').onclick=()=>{ gen(); draw(); };
     el.querySelector('.all').onclick=()=>{ for(let c=0;c<n;c++) reveal(c,c*250); };
   }
@@ -97,7 +104,7 @@
     setTimeout(()=>{
       const box=el.querySelector('#laddres');
       const row=document.createElement('div');
-      row.innerHTML=`<span style="color:${color}">●</span> 참가자 ${c+1} &nbsp;→&nbsp; 🥢 ${res[end]}`;
+      row.innerHTML=`<span style="color:${color}">●</span> 참가자 ${c+1} &nbsp;→&nbsp; ${res[end].e} ${res[end].n}`;
       box.appendChild(row);
     }, delay+1000);
   }
