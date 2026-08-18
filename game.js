@@ -20,15 +20,15 @@ function makeQuiz(stageId, pool, renderAnswer, onBack){
       <div class="note">${shown&&it.note?it.note:''}</div>
       <div class="counter">${i+1} / ${items.length}</div>
       <div class="nav2">
-        <button class="btn g" id="prevB">◀ 이전</button>
+        <button class="btn g" id="prevB" ${i<=0?'disabled':''}>◀ 이전</button>
         <button class="btn p" id="revB">${shown?'정답 숨기기':'정답 공개'}</button>
-        <button class="btn g" id="nextB">다음 ▶</button>
+        <button class="btn g" id="nextB" ${i>=items.length-1?'disabled':''}>다음 ▶</button>
       </div>`;
     el.querySelector('.shuf').onclick=()=>reshuffle(+el.querySelector('.cnt').value);
     el.querySelector('.cnt').onchange=()=>reshuffle(+el.querySelector('.cnt').value);
     if(onBack) el.querySelector('.backcat').onclick=onBack;
-    el.querySelector('#prevB').onclick=()=>{ i=(i-1+items.length)%items.length; shown=false; draw(); };
-    el.querySelector('#nextB').onclick=()=>{ i=(i+1)%items.length; shown=false; draw(); };
+    el.querySelector('#prevB').onclick=()=>{ if(i<=0) return; i--; shown=false; draw(); };
+    el.querySelector('#nextB').onclick=()=>{ if(i>=items.length-1) return; i++; shown=false; draw(); };
     el.querySelector('#revB').onclick=()=>{ shown=!shown; draw(); };
   }
   draw();
@@ -88,17 +88,17 @@ function buildCharades(stageId){
         <div class="qtext">${order[i]}</div>
         <div class="counter">${i+1} / ${order.length} · 🎟️ 패스 ${passLeft}/${passMax}</div>
         <div class="nav2">
-          <button class="btn g" id="p">◀ 이전</button>
-          <button class="btn g" id="pass" ${passLeft<=0?'disabled':''}>⏭ 패스 (${passLeft})</button>
-          <button class="btn p" id="n">다음 제시어 ▶</button>
+          <button class="btn g" id="p" ${i<=0?'disabled':''}>◀ 이전</button>
+          <button class="btn g" id="pass" ${passLeft<=0||i>=order.length-1?'disabled':''}>⏭ 패스 (${passLeft})</button>
+          <button class="btn p" id="n" ${i>=order.length-1?'disabled':''}>다음 제시어 ▶</button>
         </div>
         <p class="hint">제시어를 몸으로만 표현하세요! 화면은 연기자만 보게 하세요 🙈</p>`;
       el.querySelector('.backcat').onclick=showCats;
       el.querySelector('.cnt').onchange=e=>{ count=Math.max(1,Math.min(MAX,+e.target.value||1)); rebuild(); };
       el.querySelector('.pass').onchange=e=>{ passMax=Math.max(0,Math.min(20,+e.target.value||0)); passLeft=passMax; draw(); };
-      el.querySelector('#p').onclick=()=>{ i=(i-1+order.length)%order.length; draw(); };
-      el.querySelector('#n').onclick=()=>{ i=(i+1)%order.length; draw(); };
-      const pb=el.querySelector('#pass'); if(pb&&passLeft>0) pb.onclick=()=>{ passLeft--; i=(i+1)%order.length; draw(); };
+      el.querySelector('#p').onclick=()=>{ if(i<=0) return; i--; draw(); };
+      el.querySelector('#n').onclick=()=>{ if(i>=order.length-1) return; i++; draw(); };
+      const pb=el.querySelector('#pass'); if(pb&&passLeft>0&&i<order.length-1) pb.onclick=()=>{ passLeft--; i++; draw(); };
     }
     rebuild();
   }
