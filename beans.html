@@ -20,15 +20,7 @@
   const NS='http://www.w3.org/2000/svg';
   const el=document.getElementById('beanStage');
   const COLORS=['#ef476f','#0fb5a6','#ff9e00','#2aa9e0','#8338ec','#06a86b','#f15bb5','#3a86ff','#fb5607','#118ab2'];
-  const TOOLS=[
-    '쇠젓가락','쇠젓가락',
-    '장대 젓가락','장대 젓가락',
-    '집게','집게',
-    '이쑤시개','이쑤시개',
-    '나무젓가락','나무젓가락',
-    '빨대','빨대',
-    '티스푼','티스푼',
-  ];
+  const TOOLS=['쇠젓가락','장대 젓가락','나무젓가락','집게','이쑤시개','빨대','티스푼','외짝 젓가락'];
   const colW=64, rowH=34, padX=34, lineTop=60;
   let n=8, rungs=[], res=[], svg=null, revealed={};
   function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
@@ -67,7 +59,7 @@
         <svg id="ladd" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="max-width:100%; height:auto;"></svg>
       </div>
       <div id="laddres" class="hint" style="min-height:1.4rem; font-weight:700; color:var(--ink)"></div>
-      <p class="hint">위쪽 참가자를 누르면 사다리를 타고 내려가 젓가락 종류가 공개돼요. 쇠젓가락 · 장대 젓가락 · 집게 · 이쑤시개 · 나무젓가락 · 빨대 · 티스푼 (각 2세트) · 새 사다리로 재배정!</p>`;
+      <p class="hint">한 팀 8명이 서로 다른 도구를 하나씩 배정받아요. 위쪽 참가자를 누르면 사다리를 타고 내려가 도구가 공개돼요. 다음 팀은 "새 사다리"로 재배정!</p>`;
     svg=el.querySelector('#ladd');
     // 세로줄
     for(let c=0;c<n;c++){ line(xOf(c),lineTop,xOf(c),bottomY(),'#cfeaf7',4); }
