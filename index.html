@@ -60,15 +60,13 @@
         <button class="btn g" data-bgm="calm">🌊 잔잔하게</button>
         <label class="btn g" style="cursor:pointer; margin:0">📂 내 음악<input type="file" accept="audio/*" id="bgmFile" style="display:none"></label>
       </div>
-      <label>📺 유튜브 링크</label>
-      <div class="row">
-        <input type="text" id="ytUrl" placeholder="유튜브 주소 붙여넣기" style="flex:1; min-width:180px">
-        <button class="btn p" id="ytPlay">▶ 재생</button>
-      </div>
-      <div id="ytHolder" style="margin-top:10px"></div>
+      <label>🎬 상황별 유튜브 배경음 (저장됨)</label>
+      <div id="ytList"></div>
+      <button class="btn g sm" id="ytAdd" style="margin-top:6px">+ 슬롯 추가</button>
+      <div id="ytHolder" style="margin-top:12px"></div>
       <label style="margin-top:12px">볼륨</label>
       <input type="range" id="bgmVol" min="0" max="1" step="0.05" value="0.5">
-      <p class="hint">🎉 신나게 / 🌊 잔잔하게는 브라우저가 즉석에서 만드는 배경음. <b>내 음악</b>은 기기 파일, <b>유튜브 링크</b>는 붙여넣고 ▶ 재생을 누르면 돼요. (소리는 버튼 누른 뒤부터 나와요.)</p>
+      <p class="hint">각 슬롯에 유튜브 링크를 저장해두고 ▶ 로 골라 틀어요. 라벨·링크는 자동 저장돼요. (소리는 버튼 누른 뒤부터, 일부 영상은 임베드 차단으로 안 될 수 있어요.)</p>
     </div>
   </section>
 
@@ -224,13 +222,45 @@ document.getElementById('bgmFile').onchange=e=>{
   e.target.closest('label').classList.add('on');
   BGM.playFile(URL.createObjectURL(f));
 };
-document.getElementById('ytPlay').onclick=()=>{
-  const id=BGM.ytId(document.getElementById('ytUrl').value);
-  if(!id){ alert('유효한 유튜브 링크가 아니에요.'); return; }
-  document.querySelectorAll('.bgm-opts .btn').forEach(x=>x.classList.remove('on'));
-  BGM.playYouTube(id,'ytHolder');
-};
 document.getElementById('bgmVol').oninput=e=>BGM.setVolume(+e.target.value);
+
+/* 상황별 유튜브 배경음 (localStorage 저장) */
+const BKEY='fss_bgm';
+let bgmList;
+try{ bgmList=JSON.parse(localStorage.getItem(BKEY)); }catch(e){}
+if(!Array.isArray(bgmList)) bgmList=[
+  {label:'대기', url:''},
+  {label:'게임 진행 중', url:''},
+  {label:'점수 공개', url:''},
+  {label:'우승', url:''},
+  {label:'기타', url:''},
+];
+const saveBgm=()=>localStorage.setItem(BKEY, JSON.stringify(bgmList));
+const esc=s=>String(s).replace(/"/g,'&quot;');
+function renderBgmList(){
+  const el=document.getElementById('ytList'); el.innerHTML='';
+  bgmList.forEach((it,idx)=>{
+    const row=document.createElement('div'); row.className='row'; row.style.marginBottom='8px';
+    row.innerHTML=`<input class="lbl" value="${esc(it.label)}" style="max-width:130px">
+      <input class="url" placeholder="유튜브 링크" value="${esc(it.url)}" style="flex:1; min-width:150px">
+      <button class="btn p sm play">▶</button>
+      <button class="btn g sm del">🗑</button>`;
+    row.querySelector('.lbl').onchange=e=>{ bgmList[idx].label=e.target.value; saveBgm(); };
+    row.querySelector('.url').onchange=e=>{ bgmList[idx].url=e.target.value; saveBgm(); };
+    row.querySelector('.play').onclick=()=>{
+      const url=row.querySelector('.url').value;
+      const id=BGM.ytId(url);
+      if(!id){ alert('유효한 유튜브 링크가 아니에요.'); return; }
+      bgmList[idx].url=url; saveBgm();
+      document.querySelectorAll('.bgm-opts .btn').forEach(x=>x.classList.remove('on'));
+      BGM.playYouTube(id,'ytHolder');
+    };
+    row.querySelector('.del').onclick=()=>{ bgmList.splice(idx,1); saveBgm(); renderBgmList(); };
+    el.appendChild(row);
+  });
+}
+document.getElementById('ytAdd').onclick=()=>{ bgmList.push({label:'새 배경음', url:''}); saveBgm(); renderBgmList(); };
+renderBgmList();
 
 /* ---------- init ---------- */
 renderSched();
