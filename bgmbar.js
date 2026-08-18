@@ -36,11 +36,7 @@
 
   window.bgmbarPlay=play; window.bgmbarStop=stop; window.bgmbarRefresh=render;
 
-  // 페이지 이동 후 마지막 곡 자동 재개 시도 (브라우저가 막으면 🎵 한 번 눌러 재생)
-  window.addEventListener('load',()=>{
-    const cur=localStorage.getItem(CUR); if(!cur) return;
-    const id=BGM.ytId(cur); if(!id) return;
-    dock.hidden=false; try{ BGM.playYouTube(id,'bgmbar-holder'); }catch(e){}
-  });
+  // 새로고침 시 자동재생 안 함. 이전 선택 표시도 지움(재생 중인 것만 강조)
+  localStorage.removeItem(CUR);
   render();
 })();
