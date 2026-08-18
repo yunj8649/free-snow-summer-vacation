@@ -4,7 +4,7 @@ const GAMES = [
   {emoji:'⭕❌', name:'OX 퀴즈',   time:'15분', score:20, tab:'ox'},
   {emoji:'🤸', name:'몸으로 말해요',            time:'30분', score:30, tab:'charades'},
   {emoji:'💡', name:'초성 맞추기',              time:'15분', score:25, tab:'initials'},
-  {emoji:'🥢', name:'콩 옮기기',        time:'15분', score:35},
+  {emoji:'🥢', name:'콩 옮기기',        time:'15분', score:35, tab:'beans'},
 ];
 
 const OX = [
