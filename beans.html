@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>콩 옮기기 · 젓가락 복불복</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="gamepage">
+  <div class="card">
+    <a class="btn g sm back-link" href="./index.html">← 진행 순서</a>
+    <div class="stage" id="beanStage"></div>
+  </div>
+</main>
+<script src="bgm.js"></script>
+<script src="bgmbar.js"></script>
+<script>
+(function(){
+  const el=document.getElementById('beanStage');
+  let n=8;
+  function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+  function draw(assign){
+    el.innerHTML=`
+      <div class="badge">🥢 젓가락 복불복</div>
+      <div class="ctrl">인원 수 <input type="number" class="cnt" min="1" max="60" value="${n}"> 명
+        <button class="btn p sm go">🎲 젓가락 배정</button></div>
+      ${assign
+        ? `<div class="beancards">${assign.map((num,i)=>`<div class="beancard"><span>참가자 ${i+1}</span><b>🥢 ${num}</b></div>`).join('')}</div>`
+        : `<div class="qtext" style="color:var(--mut); font-size:1.4rem">인원 수를 정하고 🎲 젓가락 배정을 누르세요</div>`}
+      <p class="hint">참가자마다 젓가락 번호가 무작위로(중복 없이) 배정돼요. 다시 누르면 재배정!</p>`;
+    el.querySelector('.cnt').onchange=e=>{ n=Math.max(1,Math.min(60,+e.target.value||1)); };
+    el.querySelector('.go').onclick=()=>{ n=Math.max(1,Math.min(60,+el.querySelector('.cnt').value||1)); draw(shuffle(Array.from({length:n},(_,i)=>i+1))); };
+  }
+  draw(null);
+})();
+</script>
+</body>
+</html>
