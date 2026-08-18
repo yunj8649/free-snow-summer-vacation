@@ -16,6 +16,7 @@
   <button data-tab="schedule" class="active">진행 순서</button>
   <button data-tab="teams">팀</button>
   <button data-tab="score">점수판</button>
+  <button data-tab="bgm">🎵 BGM</button>
 </nav>
 <main>
   <section id="schedule" class="active">
@@ -51,12 +52,27 @@
     </div>
   </section>
 
+  <section id="bgm">
+    <div class="card">
+      <div class="bgm-opts">
+        <button class="btn g on" data-bgm="off">🔇 끄기</button>
+        <button class="btn g" data-bgm="fun">🎉 신나게</button>
+        <button class="btn g" data-bgm="calm">🌊 잔잔하게</button>
+        <label class="btn g" style="cursor:pointer; margin:0">📂 내 음악<input type="file" accept="audio/*" id="bgmFile" style="display:none"></label>
+      </div>
+      <label>볼륨</label>
+      <input type="range" id="bgmVol" min="0" max="1" step="0.05" value="0.5">
+      <p class="hint">🎉 신나게 / 🌊 잔잔하게는 브라우저가 즉석에서 만드는 배경음이에요. <b>내 음악</b>으로 원하는 파일을 골라 반복 재생할 수도 있어요.</p>
+    </div>
+  </section>
+
   <footer style="text-align:center; padding:10px 0 30px">
     <button class="btn g sm" id="resetAll">🗑 데이터 초기화 (팀·점수·공개상태)</button>
   </footer>
 </main>
 
 <script src="data.js"></script>
+<script src="bgm.js"></script>
 <script>
 /* ---------- state ---------- */
 const KEY='fss2026b'; // 게임 구성 변경으로 저장키 갱신(기존 저장값 초기화)
@@ -171,8 +187,38 @@ function renderScore(){
   const done=GAMES.every((g,gi)=>state.teams.some((_,ti)=>(+state.scores[ti][gi]||0)>0)); // 모든 게임에 점수 반영됨
   document.getElementById('winner').innerHTML =
     (done && max>0) ? `🏆 우승: ${state.teams.map((t,i)=>totals[i]===max?t.name:'').filter(Boolean).join(', ')} (${max}점)` : '';
+  if(done && max>0){ if(!renderScore._won){ renderScore._won=true; celebrate(); } }
+  else renderScore._won=false;
   document.getElementById('scoreHint').textContent='점수를 직접 입력하거나 "이김"을 체크하면 그 게임 배점만큼 자동 반영돼요.';
 }
+// 우승 축하 컨페티
+function celebrate(){
+  const colors=['#ffb703','#ff9e00','#ef476f','#06a86b','#2aa9e0','#0fb5a6','#ffd23f'];
+  for(let i=0;i<100;i++){
+    const s=document.createElement('div'); s.className='confetti';
+    s.style.left=Math.random()*100+'vw';
+    s.style.background=colors[i%colors.length];
+    s.style.animationDelay=(Math.random()*0.7)+'s';
+    s.style.animationDuration=(2.4+Math.random()*1.4)+'s';
+    s.style.width=(7+Math.random()*8)+'px';
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(), 4200);
+  }
+}
+
+/* ---------- BGM ---------- */
+document.querySelectorAll('.bgm-opts button[data-bgm]').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.bgm-opts .btn').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  BGM.select(b.dataset.bgm);
+});
+document.getElementById('bgmFile').onchange=e=>{
+  const f=e.target.files[0]; if(!f) return;
+  document.querySelectorAll('.bgm-opts .btn').forEach(x=>x.classList.remove('on'));
+  e.target.closest('label').classList.add('on');
+  BGM.playFile(URL.createObjectURL(f));
+};
+document.getElementById('bgmVol').oninput=e=>BGM.setVolume(+e.target.value);
 
 /* ---------- init ---------- */
 renderSched();
