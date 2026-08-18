@@ -99,7 +99,13 @@ a.btn { text-decoration:none; display:inline-block; }
 .bgmbar-vol input{ flex:1; }
 #bgmbar-dock{ position:fixed; right:12px; bottom:12px; z-index:9998; width:120px; height:68px; border-radius:10px; overflow:hidden; box-shadow:0 6px 18px rgba(14,58,82,.3); background:#000; }
 #bgmbar-dock[hidden]{ display:none; }
-.bgmbar-skip{ display:flex; flex-wrap:wrap; gap:6px; margin:4px 0; }
-.bgmbar-skip button{ flex:1 1 45%; border:none; background:#eaf6fc; color:var(--ink); border-radius:10px; padding:9px 6px; cursor:pointer; font-weight:700; font-size:.85rem; white-space:nowrap; }
+.bgmbar-skip{ display:flex; gap:5px; margin:4px 0; }
+.bgmbar-skip button{ flex:1; border:none; background:#eaf6fc; color:var(--ink); border-radius:9px; padding:9px 2px; cursor:pointer; font-weight:700; font-size:.8rem; white-space:nowrap; }
+.bgmbar-chaps{ max-height:180px; overflow-y:auto; margin:4px 0; border-top:1px solid var(--line); }
+.chap-row{ display:block; width:100%; text-align:left; border:none; background:transparent; color:var(--ink); border-bottom:1px solid var(--line); padding:7px 8px; cursor:pointer; font-size:.85rem; }
+.chap-row:hover{ background:#eaf6fc; }
+.chap-row b{ color:var(--teal); margin-right:6px; }
 .bgmbar-now{ color:var(--teal); font-weight:800; font-size:.92rem; padding:2px 6px 6px; text-align:center; }
 .bgmbar-now:empty{ display:none; }
+.chbox .chtable{ max-height:220px; overflow-y:auto; border:2px solid var(--line); border-radius:10px; margin-bottom:8px; background:#f7fdff; }
+.chbox .chtable .chap-row:last-child{ border-bottom:none; }
