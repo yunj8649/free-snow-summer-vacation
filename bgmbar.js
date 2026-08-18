@@ -4,6 +4,7 @@
   const BKEY='fss_bgm', CUR='fss_bgm_cur', VKEY='fss_bgm_vol';
   function list(){ try{ return JSON.parse(localStorage.getItem(BKEY))||[]; }catch(e){ return []; } }
   function normCh(arr){ return (arr||[]).map(c=> typeof c==='number' ? {t:c,label:''} : {t:+c.t||0,label:c.label||''}).sort((a,b)=>a.t-b.t); }
+  function mmss(s){ s=Math.floor(s); const h=Math.floor(s/3600), m=Math.floor(s%3600/60), ss=s%60; return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(ss).padStart(2,'0'); }
   let vol=parseFloat(localStorage.getItem(VKEY)); if(isNaN(vol)) vol=0.5;
   BGM.setVolume(vol);
 
@@ -18,6 +19,7 @@
   function render(){
     const items=list().filter(x=>x.url && BGM.ytId(x.url));
     const cur=localStorage.getItem(CUR);
+    const curCh = cur ? normCh((list().find(x=>x.url===cur)||{}).chapters) : [];
     const m=menu();
     m.innerHTML = '<button class="bgmbar-item stop">🔇 끄기</button>'
       + (items.length
@@ -25,19 +27,21 @@
         : '<div class="bgmbar-empty">저장된 곡이 없어요.<br>🎵 BGM 탭에서 추가하세요.</div>')
       + '<div class="bgmbar-now" id="bgmbar-now"></div>'
       + '<div class="bgmbar-skip">'
-        + '<button class="chp" data-dir="-1">⏮ 이전 구간</button>'
-        + '<button class="skip" data-d="-60">⏪ 1분 전</button>'
-        + '<button class="skip" data-d="60">1분 후 ⏩</button>'
-        + '<button class="chp" data-dir="1">다음 구간 ⏭</button>'
+        + '<button class="chp" data-dir="-1">⏮구간</button>'
+        + '<button class="skip" data-d="-60">⏪1분</button>'
+        + '<button class="skip" data-d="60">1분⏩</button>'
+        + '<button class="chp" data-dir="1">구간⏭</button>'
       + '</div>'
+      + (curCh.length ? '<div class="bgmbar-chaps">'+curCh.map(c=>`<button class="chap-row" data-t="${c.t}"><b>${mmss(c.t)}</b> ${c.label||''}</button>`).join('')+'</div>' : '')
       + `<div class="bgmbar-vol">🔊 <input type="range" class="vol" min="0" max="1" step="0.05" value="${vol}"></div>`;
     m.querySelectorAll('.bgmbar-item[data-url]').forEach(b=>b.onclick=()=>play(b.dataset.url));
     m.querySelectorAll('.skip').forEach(b=>b.onclick=()=>BGM.seek(+b.dataset.d));
     m.querySelectorAll('.chp').forEach(b=>b.onclick=()=>chapterSkip(+b.dataset.dir));
+    m.querySelectorAll('.chap-row').forEach(b=>b.onclick=()=>{ BGM.seekTo(+b.dataset.t); });
     m.querySelector('.stop').onclick=()=>stop();
     m.querySelector('.vol').oninput=e=>{ vol=+e.target.value; localStorage.setItem(VKEY,vol); BGM.setVolume(vol); };
   }
-  function play(url){ const id=BGM.ytId(url); if(!id) return; localStorage.setItem(CUR,url); dock.hidden=false; BGM.playYouTube(id,'bgmbar-holder'); render(); }
+  function play(url, start){ const id=BGM.ytId(url); if(!id) return; localStorage.setItem(CUR,url); dock.hidden=false; BGM.playYouTube(id,'bgmbar-holder', start); render(); }
   function chapterSkip(dir){
     const url=localStorage.getItem(CUR); if(!url) return;
     const it=list().find(x=>x.url===url);
