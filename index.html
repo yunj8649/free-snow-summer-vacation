@@ -229,10 +229,14 @@ if(!Array.isArray(bgmList)) bgmList=[
 ];
 const saveBgm=()=>localStorage.setItem(BKEY, JSON.stringify(bgmList));
 if(!localStorage.getItem(BKEY)){ saveBgm(); if(window.bgmbarRefresh) bgmbarRefresh(); } // default 목록을 저장해 플로팅 바에도 노출
-const chStr=arr=>(arr||[]).map(s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0')).join(', ');
-const parseTimes=str=>String(str||'').split(/[,\n]/).map(x=>x.trim()).filter(Boolean)
-  .map(x=>{ if(x.includes(':')){ const p=x.split(':').map(Number); return (p[0]||0)*60+(p[1]||0); } const n=Number(x); return isNaN(n)?null:n; })
-  .filter(v=>v!=null).sort((a,b)=>a-b);
+const mmss=s=>{ s=Math.floor(s); const h=Math.floor(s/3600), m=Math.floor(s%3600/60), ss=s%60; return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(ss).padStart(2,'0'); };
+const normCh=arr=>(arr||[]).map(c=> typeof c==='number'?{t:c,label:''}:{t:+c.t||0,label:c.label||''}).sort((a,b)=>a.t-b.t);
+const chStr=arr=>normCh(arr).map(c=> mmss(c.t)+(c.label?' '+c.label:'')).join('\n');
+const parseT1=x=>{ x=x.trim(); if(x.includes(':')){ const p=x.split(':').map(Number); return p.length===3?(p[0]*3600+p[1]*60+p[2]):(p[0]*60+(p[1]||0)); } const n=Number(x); return isNaN(n)?null:n; };
+const parseChapters=str=>String(str||'').split(/\n/).map(l=>l.trim()).filter(Boolean).map(l=>{
+  const m=l.match(/^(\d+(?::\d{1,2}){0,2})\s*(.*)$/); if(!m) return null;
+  const t=parseT1(m[1]); return t==null?null:{t, label:(m[2]||'').trim()};
+}).filter(Boolean).sort((a,b)=>a.t-b.t);
 const esc=s=>String(s).replace(/"/g,'&quot;');
 function renderBgmList(){
   const el=document.getElementById('ytList'); el.innerHTML='';
@@ -244,14 +248,13 @@ function renderBgmList(){
       <button class="btn g sm del">🗑</button>
       <button class="btn g sm open">↗ 이동</button>
       <button class="btn g sm chtoggle">🎬 구간</button>
-      <input class="ch" placeholder="구간 시간 (예: 0:00, 1:30, 3:10)" value="${esc(chStr(it.chapters))}" style="flex-basis:100%; min-width:150px; display:none">`;
+      <textarea class="ch" rows="5" placeholder="한 줄에 하나 — 예: 0:00 오프닝곡" style="flex-basis:100%; display:none">${esc(chStr(it.chapters))}</textarea>`;
     row.querySelector('.lbl').onchange=e=>{ bgmList[idx].label=e.target.value; saveBgm(); if(window.bgmbarRefresh) bgmbarRefresh(); };
     row.querySelector('.url').onchange=e=>{ bgmList[idx].url=e.target.value; saveBgm(); if(window.bgmbarRefresh) bgmbarRefresh(); };
     row.querySelector('.open').onclick=()=>{ const u=row.querySelector('.url').value.trim(); if(u) window.open(u,'_blank'); };
-    const chInp=row.querySelector('.ch');
-    if((it.chapters||[]).length) chInp.style.display='';   // 이미 있으면 펼침
+    const chInp=row.querySelector('.ch');   // 항상 숨김, 🎬 구간 눌러야 펼쳐짐
     row.querySelector('.chtoggle').onclick=()=>{ chInp.style.display = chInp.style.display==='none' ? '' : 'none'; if(chInp.style.display!=='none') chInp.focus(); };
-    chInp.onchange=e=>{ bgmList[idx].chapters=parseTimes(e.target.value); saveBgm(); if(window.bgmbarRefresh) bgmbarRefresh(); };
+    chInp.onchange=e=>{ bgmList[idx].chapters=parseChapters(e.target.value); saveBgm(); if(window.bgmbarRefresh) bgmbarRefresh(); };
     row.querySelector('.play').onclick=()=>{
       const url=row.querySelector('.url').value;
       const id=BGM.ytId(url);
