@@ -1,8 +1,10 @@
 /* 여름 정모 레크레이션 - 우측 상단 플로팅 배경음 선택 바 (모든 화면 공통)
    BGM 탭에 저장한 유튜브 라벨을 어느 화면에서든 골라 재생. bgm.js 를 먼저 로드. */
 (function(){
-  const BKEY='fss_bgm', CUR='fss_bgm_cur';
+  const BKEY='fss_bgm', CUR='fss_bgm_cur', VKEY='fss_bgm_vol';
   function list(){ try{ return JSON.parse(localStorage.getItem(BKEY))||[]; }catch(e){ return []; } }
+  let vol=parseFloat(localStorage.getItem(VKEY)); if(isNaN(vol)) vol=0.5;
+  BGM.setVolume(vol);
 
   const bar=document.createElement('div'); bar.id='bgmbar';
   bar.innerHTML='<button id="bgmbar-toggle" title="배경음 선택">🎵</button><div id="bgmbar-menu" hidden></div>';
@@ -19,9 +21,11 @@
     m.innerHTML = (items.length
         ? items.map(x=>`<button class="bgmbar-item${cur===x.url?' on':''}" data-url="${(x.url||'').replace(/"/g,'&quot;')}">▶ ${x.label||'배경음'}</button>`).join('')
         : '<div class="bgmbar-empty">저장된 곡이 없어요.<br>🎵 BGM 탭에서 추가하세요.</div>')
-      + '<button class="bgmbar-item stop">🔇 끄기</button>';
+      + '<button class="bgmbar-item stop">🔇 끄기</button>'
+      + `<div class="bgmbar-vol">🔊 <input type="range" class="vol" min="0" max="1" step="0.05" value="${vol}"></div>`;
     m.querySelectorAll('.bgmbar-item[data-url]').forEach(b=>b.onclick=()=>play(b.dataset.url));
     m.querySelector('.stop').onclick=()=>stop();
+    m.querySelector('.vol').oninput=e=>{ vol=+e.target.value; localStorage.setItem(VKEY,vol); BGM.setVolume(vol); };
   }
   function play(url){ const id=BGM.ytId(url); if(!id) return; localStorage.setItem(CUR,url); dock.hidden=false; BGM.playYouTube(id,'bgmbar-holder'); render(); }
   function stop(){ BGM.select('off'); localStorage.removeItem(CUR); dock.hidden=true; render(); }
