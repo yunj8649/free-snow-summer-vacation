@@ -35,13 +35,16 @@ function makeQuiz(stageId, pool, renderAnswer, onBack){
 function buildInitials(stageId){
   const el=document.getElementById(stageId);
   const cats=Object.keys(INITIALS);
+  const visited=new Set();
   function showCats(){
     el.innerHTML='<div class="badge">초성 맞추기 · 주제 선택</div>'
       + '<div class="catcards">'
-      + cats.map(c=>`<button class="catcard" data-c="${c}">${c}<span>${INITIALS[c].length}문제</span></button>`).join('')
+      + cats.map(c=>`<button class="catcard${visited.has(c)?' visited':''}" data-c="${c}">${c}<span>${INITIALS[c].length}문제</span></button>`).join('')
+      + '<button class="catcard rand" data-c="__rand">🎲 랜덤 주제<span>무작위</span></button>'
       + '</div>';
     el.querySelectorAll('.catcard').forEach(b=>b.onclick=()=>{
-      const cat=b.dataset.c;
+      let cat=b.dataset.c; if(cat==='__rand') cat=cats[Math.floor(Math.random()*cats.length)];
+      visited.add(cat);
       const pool=INITIALS[cat].map(([q,a])=>({badge:cat, q, note:'', answer:a}));
       makeQuiz(stageId, pool, it=>it.answer, showCats);
     });
@@ -53,15 +56,16 @@ function buildInitials(stageId){
 function buildCharades(stageId){
   const el=document.getElementById(stageId);
   const cats=Object.keys(CHARADES);
+  const visited=new Set();
   function showCats(){
     el.innerHTML='<div class="badge">몸으로 말해요 · 주제 선택</div>'
       + '<div class="catcards">'
-      + cats.map(c=>`<button class="catcard" data-c="${c}">${c}<span>${CHARADES[c].length}개</span></button>`).join('')
+      + cats.map(c=>`<button class="catcard${visited.has(c)?' visited':''}" data-c="${c}">${c}<span>${CHARADES[c].length}개</span></button>`).join('')
       + '<button class="catcard rand" data-c="__rand">🎲 랜덤 주제<span>무작위</span></button>'
       + '</div>';
     el.querySelectorAll('.catcard').forEach(b=>b.onclick=()=>{
       let c=b.dataset.c; if(c==='__rand') c=cats[Math.floor(Math.random()*cats.length)];
-      startCat(c);
+      visited.add(c); startCat(c);
     });
   }
   function startCat(cat){
