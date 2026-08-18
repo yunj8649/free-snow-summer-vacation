@@ -248,13 +248,22 @@ function renderBgmList(){
       <button class="btn g sm del">🗑</button>
       <button class="btn g sm open">↗ 이동</button>
       <button class="btn g sm chtoggle">🎬 구간</button>
-      <textarea class="ch" rows="5" placeholder="한 줄에 하나 — 예: 0:00 오프닝곡" style="flex-basis:100%; display:none">${esc(chStr(it.chapters))}</textarea>`;
+      <div class="chbox" style="flex-basis:100%; display:none">
+        <div class="chtable"></div>
+        <textarea class="ch" rows="4" placeholder="한 줄에 하나 — 예: 0:00 오프닝곡">${esc(chStr(it.chapters))}</textarea>
+      </div>`;
     row.querySelector('.lbl').onchange=e=>{ bgmList[idx].label=e.target.value; saveBgm(); if(window.bgmbarRefresh) bgmbarRefresh(); };
     row.querySelector('.url').onchange=e=>{ bgmList[idx].url=e.target.value; saveBgm(); if(window.bgmbarRefresh) bgmbarRefresh(); };
     row.querySelector('.open').onclick=()=>{ const u=row.querySelector('.url').value.trim(); if(u) window.open(u,'_blank'); };
-    const chInp=row.querySelector('.ch');   // 항상 숨김, 🎬 구간 눌러야 펼쳐짐
-    row.querySelector('.chtoggle').onclick=()=>{ chInp.style.display = chInp.style.display==='none' ? '' : 'none'; if(chInp.style.display!=='none') chInp.focus(); };
-    chInp.onchange=e=>{ bgmList[idx].chapters=parseChapters(e.target.value); saveBgm(); if(window.bgmbarRefresh) bgmbarRefresh(); };
+    const chbox=row.querySelector('.chbox'), chTable=row.querySelector('.chtable'), chInp=row.querySelector('.ch');
+    const drawChTable=()=>{
+      const ch=normCh(bgmList[idx].chapters);
+      chTable.innerHTML = ch.length ? ch.map(c=>`<button class="chap-row" data-t="${c.t}"><b>${mmss(c.t)}</b> ${c.label||''}</button>`).join('')
+        : '<div class="hint" style="padding:6px">구간이 없어요. 아래 칸에 입력하세요.</div>';
+      chTable.querySelectorAll('.chap-row').forEach(b=>b.onclick=()=>{ const u=row.querySelector('.url').value.trim(); if(u&&window.bgmbarPlay) bgmbarPlay(u,+b.dataset.t); });
+    };
+    row.querySelector('.chtoggle').onclick=()=>{ chbox.style.display = chbox.style.display==='none' ? '' : 'none'; if(chbox.style.display!=='none') drawChTable(); };
+    chInp.onchange=e=>{ bgmList[idx].chapters=parseChapters(e.target.value); saveBgm(); drawChTable(); if(window.bgmbarRefresh) bgmbarRefresh(); };
     row.querySelector('.play').onclick=()=>{
       const url=row.querySelector('.url').value;
       const id=BGM.ytId(url);
