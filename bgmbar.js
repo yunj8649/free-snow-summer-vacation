@@ -3,6 +3,7 @@
 (function(){
   const BKEY='fss_bgm', CUR='fss_bgm_cur', VKEY='fss_bgm_vol';
   function list(){ try{ return JSON.parse(localStorage.getItem(BKEY))||[]; }catch(e){ return []; } }
+  function normCh(arr){ return (arr||[]).map(c=> typeof c==='number' ? {t:c,label:''} : {t:+c.t||0,label:c.label||''}).sort((a,b)=>a.t-b.t); }
   let vol=parseFloat(localStorage.getItem(VKEY)); if(isNaN(vol)) vol=0.5;
   BGM.setVolume(vol);
 
@@ -22,6 +23,7 @@
       + (items.length
         ? items.map(x=>`<button class="bgmbar-item${cur===x.url?' on':''}" data-url="${(x.url||'').replace(/"/g,'&quot;')}">▶ ${x.label||'배경음'}</button>`).join('')
         : '<div class="bgmbar-empty">저장된 곡이 없어요.<br>🎵 BGM 탭에서 추가하세요.</div>')
+      + '<div class="bgmbar-now" id="bgmbar-now"></div>'
       + '<div class="bgmbar-skip"><button class="chp" data-dir="-1">⏮ 구간</button><button class="chp" data-dir="1">구간 ⏭</button></div>'
       + '<div class="bgmbar-skip"><button class="skip" data-dir="-1">⏪</button><input class="skipN" type="number" min="1" value="60" title="건너뛸 초">초<button class="skip" data-dir="1">⏩</button></div>'
       + `<div class="bgmbar-vol">🔊 <input type="range" class="vol" min="0" max="1" step="0.05" value="${vol}"></div>`;
@@ -36,18 +38,30 @@
   function chapterSkip(dir){
     const url=localStorage.getItem(CUR); if(!url) return;
     const it=list().find(x=>x.url===url);
-    const ch=((it&&it.chapters)||[]).slice().sort((a,b)=>a-b);
+    const ch=normCh(it&&it.chapters);
     if(!ch.length){ alert('이 곡에 저장된 구간이 없어요.\n🎵 BGM 탭에서 "🎬 구간"을 눌러 시간을 입력하세요.'); return; }
     const t=BGM.getTime();
     let target;
-    if(dir>0){ target=ch.find(c=>c>t+0.8); if(target==null) target=ch[ch.length-1]; }
-    else { const before=ch.filter(c=>c<t-1.5); target=before.length?before[before.length-1]:0; }
-    BGM.seekTo(target);
+    if(dir>0){ target=ch.find(c=>c.t>t+0.8); if(!target) target=ch[ch.length-1]; }
+    else { const before=ch.filter(c=>c.t<t-1.5); target=before.length?before[before.length-1]:ch[0]; }
+    BGM.seekTo(target.t); showNow(target.label);
   }
+  function showNow(label){ const el=document.getElementById('bgmbar-now'); if(el) el.textContent=label?('▶ '+label):''; }
   function stop(){ BGM.select('off'); localStorage.removeItem(CUR); dock.hidden=true; render(); }
   bar.querySelector('#bgmbar-toggle').onclick=()=>{ const m=menu(); m.hidden=!m.hidden; if(!m.hidden) render(); };
 
   window.bgmbarPlay=play; window.bgmbarStop=stop; window.bgmbarRefresh=render;
+
+  // 재생 중이면 현재 구간 이름을 주기적으로 갱신
+  setInterval(()=>{
+    const el=document.getElementById('bgmbar-now'); if(!el) return;
+    const url=localStorage.getItem(CUR); if(!url){ el.textContent=''; return; }
+    const it=list().find(x=>x.url===url); const ch=normCh(it&&it.chapters);
+    if(!ch.length){ el.textContent=''; return; }
+    const t=BGM.getTime(); let cur=ch[0];
+    for(const c of ch){ if(c.t<=t+0.3) cur=c; else break; }
+    el.textContent = cur.label ? ('▶ '+cur.label) : '';
+  }, 1000);
 
   // 새로고침 시 자동재생 안 함. 이전 선택 표시도 지움(재생 중인 것만 강조)
   localStorage.removeItem(CUR);
