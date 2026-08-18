@@ -228,6 +228,10 @@ if(!Array.isArray(bgmList)) bgmList=[
 ];
 const saveBgm=()=>localStorage.setItem(BKEY, JSON.stringify(bgmList));
 if(!localStorage.getItem(BKEY)){ saveBgm(); if(window.bgmbarRefresh) bgmbarRefresh(); } // default 목록을 저장해 플로팅 바에도 노출
+const chStr=arr=>(arr||[]).map(s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0')).join(', ');
+const parseTimes=str=>String(str||'').split(/[,\n]/).map(x=>x.trim()).filter(Boolean)
+  .map(x=>{ if(x.includes(':')){ const p=x.split(':').map(Number); return (p[0]||0)*60+(p[1]||0); } const n=Number(x); return isNaN(n)?null:n; })
+  .filter(v=>v!=null).sort((a,b)=>a-b);
 const esc=s=>String(s).replace(/"/g,'&quot;');
 function renderBgmList(){
   const el=document.getElementById('ytList'); el.innerHTML='';
@@ -236,9 +240,11 @@ function renderBgmList(){
     row.innerHTML=`<input class="lbl" value="${esc(it.label)}" style="max-width:130px">
       <input class="url" placeholder="유튜브 링크" value="${esc(it.url)}" style="flex:1; min-width:150px">
       <button class="btn p sm play">▶</button>
-      <button class="btn g sm del">🗑</button>`;
+      <button class="btn g sm del">🗑</button>
+      <input class="ch" placeholder="구간 시간 (예: 0:00, 1:30, 3:10)" value="${esc(chStr(it.chapters))}" style="flex-basis:100%; min-width:150px">`;
     row.querySelector('.lbl').onchange=e=>{ bgmList[idx].label=e.target.value; saveBgm(); if(window.bgmbarRefresh) bgmbarRefresh(); };
     row.querySelector('.url').onchange=e=>{ bgmList[idx].url=e.target.value; saveBgm(); if(window.bgmbarRefresh) bgmbarRefresh(); };
+    row.querySelector('.ch').onchange=e=>{ bgmList[idx].chapters=parseTimes(e.target.value); saveBgm(); if(window.bgmbarRefresh) bgmbarRefresh(); };
     row.querySelector('.play').onclick=()=>{
       const url=row.querySelector('.url').value;
       const id=BGM.ytId(url);
