@@ -54,13 +54,18 @@
     BGM.seekTo(target.t); showNow(target.label);
   }
   function showNow(label){ const el=document.getElementById('bgmbar-now'); if(el) el.textContent=label?('▶ '+label):''; }
-  function stop(){ BGM.select('off'); localStorage.removeItem(CUR); sessionStorage.removeItem('bgm_playing'); dock.hidden=true; render(); }
+  function stop(){ BGM.select('off'); localStorage.removeItem(CUR); sessionStorage.removeItem('bgm_playing'); sessionStorage.removeItem('bgm_time'); dock.hidden=true; render(); }
+  // 페이지 이동해도 이어서 재생할 수 있게 현재 재생 위치 저장
+  function saveTime(){ const url=localStorage.getItem(CUR); if(!url) return; const t=BGM.getTime(); if(t>0) sessionStorage.setItem('bgm_time', JSON.stringify({url, t})); }
+  window.addEventListener('pagehide', saveTime);
+  window.addEventListener('beforeunload', saveTime);
   bar.querySelector('#bgmbar-toggle').onclick=()=>{ const m=menu(); m.hidden=!m.hidden; if(!m.hidden) render(); };
 
   window.bgmbarPlay=play; window.bgmbarStop=stop; window.bgmbarRefresh=render;
 
-  // 재생 중이면 현재 구간 이름을 주기적으로 갱신
+  // 재생 위치 주기적 저장 + 현재 구간 이름 갱신
   setInterval(()=>{
+    saveTime();
     const el=document.getElementById('bgmbar-now'); if(!el) return;
     const url=localStorage.getItem(CUR); if(!url){ el.textContent=''; return; }
     const it=list().find(x=>x.url===url); const ch=normCh(it&&it.chapters);
@@ -76,9 +81,11 @@
   const playing = sessionStorage.getItem('bgm_playing');
   if(playing && !isReload){
     const id=BGM.ytId(playing);
-    if(id){ localStorage.setItem(CUR,playing); dock.hidden=false; try{ BGM.playYouTube(id,'bgmbar-holder'); }catch(e){} }
+    let start=0;
+    try{ const saved=JSON.parse(sessionStorage.getItem('bgm_time')||'null'); if(saved && saved.url===playing) start=saved.t; }catch(e){}
+    if(id){ localStorage.setItem(CUR,playing); dock.hidden=false; try{ BGM.playYouTube(id,'bgmbar-holder', start); }catch(e){} }
   } else {
-    sessionStorage.removeItem('bgm_playing'); localStorage.removeItem(CUR);
+    sessionStorage.removeItem('bgm_playing'); sessionStorage.removeItem('bgm_time'); localStorage.removeItem(CUR);
   }
   render();
 })();
