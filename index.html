@@ -220,13 +220,13 @@ const BKEY='fss_bgm';
 let bgmList;
 try{ bgmList=JSON.parse(localStorage.getItem(BKEY)); }catch(e){}
 if(!Array.isArray(bgmList)) bgmList=[
-  {label:'대기', url:''},
-  {label:'게임 진행 중', url:''},
-  {label:'점수 공개', url:''},
-  {label:'우승', url:''},
-  {label:'기타', url:''},
+  {label:'대기', url:'https://youtu.be/_Xlxhxp_sa0'},
+  {label:'게임 진행 1', url:'https://youtu.be/l7RTrlaE0VE'},
+  {label:'게임 진행 2', url:'https://youtu.be/ceYtWuWIOoE'},
+  {label:'점수 공개', url:'https://youtu.be/KHdtQsQZP0w'},
 ];
 const saveBgm=()=>localStorage.setItem(BKEY, JSON.stringify(bgmList));
+if(!localStorage.getItem(BKEY)){ saveBgm(); if(window.bgmbarRefresh) bgmbarRefresh(); } // default 목록을 저장해 플로팅 바에도 노출
 const esc=s=>String(s).replace(/"/g,'&quot;');
 function renderBgmList(){
   const el=document.getElementById('ytList'); el.innerHTML='';
