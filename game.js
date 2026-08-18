@@ -1,15 +1,15 @@
 /* 여름 정모 레크레이션 - 공통 게임 로직 (data.js 를 먼저 로드해야 함) */
 function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 
-// 문제 -> 정답 공개 -> 다음 (OX & 초성). 출제 수 지정 + 랜덤 뽑기
-function makeQuiz(stageId, pool, renderAnswer){
+// 문제 -> 정답 공개 -> 다음 (OX & 초성). 출제 수 지정 + 랜덤 뽑기. onBack 주면 "← 주제" 버튼 표시
+function makeQuiz(stageId, pool, renderAnswer, onBack){
   let items=shuffle(pool), i=0, shown=false;
   const el=document.getElementById(stageId);
   function reshuffle(n){ n=Math.max(1,Math.min(pool.length,n||pool.length)); items=shuffle(pool).slice(0,n); i=0; shown=false; draw(); }
   function draw(){
     const it=items[i];
     el.innerHTML=`
-      <div class="ctrl">출제 수 <input type="number" class="cnt" min="1" max="${pool.length}" value="${items.length}"> / ${pool.length}개
+      <div class="ctrl">${onBack?'<button class="btn g sm backcat">← 주제</button>':''}출제 수 <input type="number" class="cnt" min="1" max="${pool.length}" value="${items.length}"> / ${pool.length}개
         <button class="btn g sm shuf">🔀 새로 뽑기</button></div>
       <div class="badge">${it.badge}</div>
       <div class="qtext">${it.q}</div>
@@ -23,11 +23,30 @@ function makeQuiz(stageId, pool, renderAnswer){
       </div>`;
     el.querySelector('.shuf').onclick=()=>reshuffle(+el.querySelector('.cnt').value);
     el.querySelector('.cnt').onchange=()=>reshuffle(+el.querySelector('.cnt').value);
+    if(onBack) el.querySelector('.backcat').onclick=onBack;
     el.querySelector('#prevB').onclick=()=>{ i=(i-1+items.length)%items.length; shown=false; draw(); };
     el.querySelector('#nextB').onclick=()=>{ i=(i+1)%items.length; shown=false; draw(); };
     el.querySelector('#revB').onclick=()=>{ shown=!shown; draw(); };
   }
   draw();
+}
+
+// 초성 맞추기: 주제 카드 선택 -> 해당 주제 퀴즈
+function buildInitials(stageId){
+  const el=document.getElementById(stageId);
+  const cats=Object.keys(INITIALS);
+  function showCats(){
+    el.innerHTML='<div class="badge">초성 맞추기 · 주제 선택</div>'
+      + '<div class="catcards">'
+      + cats.map(c=>`<button class="catcard" data-c="${c}">${c}<span>${INITIALS[c].length}문제</span></button>`).join('')
+      + '</div>';
+    el.querySelectorAll('.catcard').forEach(b=>b.onclick=()=>{
+      const cat=b.dataset.c;
+      const pool=INITIALS[cat].map(([q,a])=>({badge:cat, q, note:'', answer:a}));
+      makeQuiz(stageId, pool, it=>it.answer, showCats);
+    });
+  }
+  showCats();
 }
 
 // 몸으로 말해요 (주제 랜덤 뽑기 -> 제시어, 패스권)
