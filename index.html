@@ -225,6 +225,7 @@ if(!Array.isArray(bgmList)) bgmList=[
   {label:'게임 진행 1', url:'https://youtu.be/l7RTrlaE0VE'},
   {label:'게임 진행 2', url:'https://youtu.be/ceYtWuWIOoE'},
   {label:'점수 공개', url:'https://youtu.be/KHdtQsQZP0w'},
+  {label:'게임쇼', url:'https://youtu.be/KEWvo0uGy-o'},
 ];
 const saveBgm=()=>localStorage.setItem(BKEY, JSON.stringify(bgmList));
 if(!localStorage.getItem(BKEY)){ saveBgm(); if(window.bgmbarRefresh) bgmbarRefresh(); } // default 목록을 저장해 플로팅 바에도 노출
