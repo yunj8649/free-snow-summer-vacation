@@ -121,3 +121,5 @@ a.btn { text-decoration:none; display:inline-block; }
 .beancard{ background:#f2fbff; border:2px solid var(--line); border-radius:14px; padding:14px 8px; text-align:center; }
 .beancard span{ display:block; color:var(--mut); font-size:.85rem; font-weight:700; }
 .beancard b{ display:block; font-size:1.8rem; color:var(--accent2); margin-top:4px; }
+.catcard.visited{ opacity:.5; filter:grayscale(.6); }
+.catcard.rand{ background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#5a3a00; }
