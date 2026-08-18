@@ -94,7 +94,7 @@ function activate(id){
 }
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>activate(b.dataset.tab));
 document.getElementById('resetAll').onclick=()=>{
-  if(confirm('팀·점수·공개 상태를 모두 초기화할까요?')){ localStorage.removeItem(KEY); location.reload(); }
+  if(confirm('팀·점수·공개 상태를 모두 초기화할까요?')){ ['fss_vis_initials','fss_vis_charades'].forEach(k=>localStorage.removeItem(k)); localStorage.removeItem(KEY); location.reload(); }
 };
 
 /* ---------- schedule (reveal one by one -> jump to game) ---------- */
