@@ -26,9 +26,11 @@
     {e:'🦀',n:'집게'},{e:'🦀',n:'집게'},
     {e:'🍢',n:'이쑤시개'},{e:'🍢',n:'이쑤시개'},
     {e:'🌳',n:'나무젓가락'},{e:'🌳',n:'나무젓가락'},
+    {e:'🥤',n:'빨대'},{e:'🥤',n:'빨대'},
+    {e:'🥄',n:'티스푼'},{e:'🥄',n:'티스푼'},
   ];
   const colW=64, rowH=34, padX=34, lineTop=60;
-  let n=TOOLS.length, rungs=[], res=[], svg=null, revealed={};
+  let n=8, rungs=[], res=[], svg=null, revealed={};
   function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
   function xOf(c){ return padX + c*colW; }
   function rowY(r){ return lineTop+26 + r*rowH; }
@@ -65,7 +67,7 @@
         <svg id="ladd" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="max-width:100%; height:auto;"></svg>
       </div>
       <div id="laddres" class="hint" style="min-height:1.4rem; font-weight:700; color:var(--ink)"></div>
-      <p class="hint">위쪽 참가자를 누르면 사다리를 타고 내려가 젓가락 종류가 공개돼요. 🥢쇠 · 🎋장대 · 🦀집게 · 🍢이쑤시개 · 🌳나무 (각 2세트) · 🎲로 새 사다리!</p>`;
+      <p class="hint">위쪽 참가자를 누르면 사다리를 타고 내려가 젓가락 종류가 공개돼요. 🥢쇠 · 🎋장대 · 🦀집게 · 🍢이쑤시개 · 🌳나무 · 🥤빨대 · 🥄티스푼 (각 2세트) · 🎲로 새 사다리!</p>`;
     svg=el.querySelector('#ladd');
     // 세로줄
     for(let c=0;c<n;c++){ line(xOf(c),lineTop,xOf(c),bottomY(),'#cfeaf7',4); }
