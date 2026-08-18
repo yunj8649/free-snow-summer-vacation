@@ -43,6 +43,10 @@ const BGM = (function(){
       if(fileAudio) fileAudio.volume=v;
       if(ytPlayer && ytPlayer.setVolume) try{ ytPlayer.setVolume(Math.round(v*100)); }catch(e){}
     },
+    seek(delta){  // 유튜브: 현재 위치에서 delta초 이동
+      if(ytPlayer && ytPlayer.getCurrentTime) try{ ytPlayer.seekTo(Math.max(0, ytPlayer.getCurrentTime()+delta), true); }catch(e){}
+      else if(fileAudio && fileAudio.duration) fileAudio.currentTime=Math.max(0, fileAudio.currentTime+delta);
+    },
     current(){ return current; },
   };
 })();
