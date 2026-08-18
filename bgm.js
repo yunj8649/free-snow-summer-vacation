@@ -52,6 +52,10 @@ const BGM = (function(){
       if(ytPlayer && ytPlayer.seekTo) try{ ytPlayer.seekTo(sec, true); if(ytPlayer.playVideo) ytPlayer.playVideo(); }catch(e){}
       else if(fileAudio) fileAudio.currentTime=sec;
     },
+    getTime(){
+      if(ytPlayer && ytPlayer.getCurrentTime){ try{ return ytPlayer.getCurrentTime(); }catch(e){ return 0; } }
+      return fileAudio ? fileAudio.currentTime : 0;
+    },
     current(){ return current; },
   };
 })();
