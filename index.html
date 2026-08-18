@@ -54,19 +54,15 @@
 
   <section id="bgm">
     <div class="card">
-      <div class="bgm-opts">
-        <button class="btn g on" data-bgm="off">🔇 끄기</button>
-        <button class="btn g" data-bgm="fun">🎉 신나게</button>
-        <button class="btn g" data-bgm="calm">🌊 잔잔하게</button>
-        <label class="btn g" style="cursor:pointer; margin:0">📂 내 음악<input type="file" accept="audio/*" id="bgmFile" style="display:none"></label>
-      </div>
       <label>🎬 상황별 유튜브 배경음 (저장됨)</label>
       <div id="ytList"></div>
-      <button class="btn g sm" id="ytAdd" style="margin-top:6px">+ 슬롯 추가</button>
-      <div id="ytHolder" style="margin-top:12px"></div>
+      <div class="bgm-opts" style="margin-top:8px">
+        <button class="btn g sm" id="ytAdd">+ 슬롯 추가</button>
+        <label class="btn g sm" style="cursor:pointer; margin:0">📂 내 음악<input type="file" accept="audio/*" id="bgmFile" style="display:none"></label>
+      </div>
       <label style="margin-top:12px">볼륨</label>
       <input type="range" id="bgmVol" min="0" max="1" step="0.05" value="0.5">
-      <p class="hint">각 슬롯에 유튜브 링크를 저장해두고 ▶ 로 골라 틀어요. 라벨·링크는 자동 저장돼요. (소리는 버튼 누른 뒤부터, 일부 영상은 임베드 차단으로 안 될 수 있어요.)</p>
+      <p class="hint">여기서 라벨·링크를 저장하면, <b>어느 화면에서든 오른쪽 위 🎵 버튼</b>으로 골라 틀 수 있어요. (소리는 버튼 누른 뒤부터, 일부 영상은 임베드 차단으로 안 될 수 있어요.)</p>
     </div>
   </section>
 
@@ -77,6 +73,7 @@
 
 <script src="data.js"></script>
 <script src="bgm.js"></script>
+<script src="bgmbar.js"></script>
 <script>
 /* ---------- state ---------- */
 const KEY='fss2026b'; // 게임 구성 변경으로 저장키 갱신(기존 저장값 초기화)
@@ -210,16 +207,10 @@ function celebrate(){
   }
 }
 
-/* ---------- BGM ---------- */
-document.querySelectorAll('.bgm-opts button[data-bgm]').forEach(b=>b.onclick=()=>{
-  document.querySelectorAll('.bgm-opts .btn').forEach(x=>x.classList.remove('on'));
-  b.classList.add('on');
-  BGM.select(b.dataset.bgm);
-});
+/* ---------- BGM (편집: 저장/삭제, 재생은 우측 상단 🎵 바에서) ---------- */
 document.getElementById('bgmFile').onchange=e=>{
   const f=e.target.files[0]; if(!f) return;
-  document.querySelectorAll('.bgm-opts .btn').forEach(x=>x.classList.remove('on'));
-  e.target.closest('label').classList.add('on');
+  if(window.bgmbarStop) bgmbarStop();
   BGM.playFile(URL.createObjectURL(f));
 };
 document.getElementById('bgmVol').oninput=e=>BGM.setVolume(+e.target.value);
@@ -245,21 +236,20 @@ function renderBgmList(){
       <input class="url" placeholder="유튜브 링크" value="${esc(it.url)}" style="flex:1; min-width:150px">
       <button class="btn p sm play">▶</button>
       <button class="btn g sm del">🗑</button>`;
-    row.querySelector('.lbl').onchange=e=>{ bgmList[idx].label=e.target.value; saveBgm(); };
-    row.querySelector('.url').onchange=e=>{ bgmList[idx].url=e.target.value; saveBgm(); };
+    row.querySelector('.lbl').onchange=e=>{ bgmList[idx].label=e.target.value; saveBgm(); if(window.bgmbarRefresh) bgmbarRefresh(); };
+    row.querySelector('.url').onchange=e=>{ bgmList[idx].url=e.target.value; saveBgm(); if(window.bgmbarRefresh) bgmbarRefresh(); };
     row.querySelector('.play').onclick=()=>{
       const url=row.querySelector('.url').value;
       const id=BGM.ytId(url);
       if(!id){ alert('유효한 유튜브 링크가 아니에요.'); return; }
       bgmList[idx].url=url; saveBgm();
-      document.querySelectorAll('.bgm-opts .btn').forEach(x=>x.classList.remove('on'));
-      BGM.playYouTube(id,'ytHolder');
+      if(window.bgmbarPlay){ bgmbarPlay(url); } // 우측 상단 바로 재생
     };
-    row.querySelector('.del').onclick=()=>{ bgmList.splice(idx,1); saveBgm(); renderBgmList(); };
+    row.querySelector('.del').onclick=()=>{ bgmList.splice(idx,1); saveBgm(); renderBgmList(); if(window.bgmbarRefresh) bgmbarRefresh(); };
     el.appendChild(row);
   });
 }
-document.getElementById('ytAdd').onclick=()=>{ bgmList.push({label:'새 배경음', url:''}); saveBgm(); renderBgmList(); };
+document.getElementById('ytAdd').onclick=()=>{ bgmList.push({label:'새 배경음', url:''}); saveBgm(); renderBgmList(); if(window.bgmbarRefresh) bgmbarRefresh(); };
 renderBgmList();
 
 /* ---------- init ---------- */
