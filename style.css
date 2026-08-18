@@ -116,3 +116,8 @@ a.btn { text-decoration:none; display:inline-block; }
   display:flex; flex-direction:column; align-items:center; gap:6px; }
 .catcard span{ font-size:.9rem; font-weight:600; opacity:.9; }
 .catcard:hover{ filter:brightness(1.05); }
+/* 젓가락 복불복 배정 카드 */
+.beancards{ display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:12px; margin:18px 0; }
+.beancard{ background:#f2fbff; border:2px solid var(--line); border-radius:14px; padding:14px 8px; text-align:center; }
+.beancard span{ display:block; color:var(--mut); font-size:.85rem; font-weight:700; }
+.beancard b{ display:block; font-size:1.8rem; color:var(--accent2); margin-top:4px; }
