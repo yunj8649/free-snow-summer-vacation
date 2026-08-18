@@ -21,9 +21,11 @@
     m.innerHTML = (items.length
         ? items.map(x=>`<button class="bgmbar-item${cur===x.url?' on':''}" data-url="${(x.url||'').replace(/"/g,'&quot;')}">▶ ${x.label||'배경음'}</button>`).join('')
         : '<div class="bgmbar-empty">저장된 곡이 없어요.<br>🎵 BGM 탭에서 추가하세요.</div>')
+      + '<div class="bgmbar-skip"><button class="skip" data-d="-60">⏮ 1분</button><button class="skip" data-d="60">1분 ⏭</button></div>'
       + '<button class="bgmbar-item stop">🔇 끄기</button>'
       + `<div class="bgmbar-vol">🔊 <input type="range" class="vol" min="0" max="1" step="0.05" value="${vol}"></div>`;
     m.querySelectorAll('.bgmbar-item[data-url]').forEach(b=>b.onclick=()=>play(b.dataset.url));
+    m.querySelectorAll('.skip').forEach(b=>b.onclick=()=>BGM.seek(+b.dataset.d));
     m.querySelector('.stop').onclick=()=>stop();
     m.querySelector('.vol').oninput=e=>{ vol=+e.target.value; localStorage.setItem(VKEY,vol); BGM.setVolume(vol); };
   }
