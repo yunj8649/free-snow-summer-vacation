@@ -25,15 +25,15 @@ const BGM = (function(){
       if(!fileAudio){ fileAudio=new Audio(); fileAudio.loop=true; }
       fileAudio.src=url; fileAudio.volume=vol; fileAudio.play().catch(()=>{});
     },
-    playYouTube(id, holderId){
-      current='yt'; stopFile();
+    playYouTube(id, holderId, start){
+      current='yt'; stopFile(); start=Math.max(0, Math.floor(start||0));
       loadYTApi(()=>{
         if(ytPlayer && ytPlayer.loadVideoById){
-          ytPlayer.loadVideoById(id); ytPlayer.setVolume(Math.round(vol*100)); ytPlayer.playVideo(); return;
+          ytPlayer.loadVideoById({videoId:id, startSeconds:start}); ytPlayer.setVolume(Math.round(vol*100)); ytPlayer.playVideo(); return;
         }
         ytPlayer=new YT.Player(holderId, {
           height:'68', width:'120', videoId:id,
-          playerVars:{ autoplay:1, loop:1, playlist:id, rel:0 },
+          playerVars:{ autoplay:1, loop:1, playlist:id, rel:0, start:start },
           events:{ onReady:e=>{ e.target.setVolume(Math.round(vol*100)); e.target.playVideo(); } }
         });
       });
