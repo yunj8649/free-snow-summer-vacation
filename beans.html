@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>콩 옮기기 · 젓가락 복불복</title>
+<title>콩 옮기기</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -17,22 +17,91 @@
 <script src="bgmbar.js"></script>
 <script>
 (function(){
+  const NS='http://www.w3.org/2000/svg';
   const el=document.getElementById('beanStage');
-  let n=8;
+  const COLORS=['#ef476f','#0fb5a6','#ff9e00','#2aa9e0','#8338ec','#06a86b','#f15bb5','#3a86ff','#fb5607','#118ab2'];
+  const colW=64, rowH=34, padX=34, lineTop=60;
+  let n=6, rungs=[], res=[], svg=null, revealed={};
   function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
-  function draw(assign){
-    el.innerHTML=`
-      <div class="badge">🥢 젓가락 복불복</div>
-      <div class="ctrl">인원 수 <input type="number" class="cnt" min="1" max="60" value="${n}"> 명
-        <button class="btn p sm go">🎲 젓가락 배정</button></div>
-      ${assign
-        ? `<div class="beancards">${assign.map((num,i)=>`<div class="beancard"><span>참가자 ${i+1}</span><b>🥢 ${num}</b></div>`).join('')}</div>`
-        : `<div class="qtext" style="color:var(--mut); font-size:1.4rem">인원 수를 정하고 🎲 젓가락 배정을 누르세요</div>`}
-      <p class="hint">참가자마다 젓가락 번호가 무작위로(중복 없이) 배정돼요. 다시 누르면 재배정!</p>`;
-    el.querySelector('.cnt').onchange=e=>{ n=Math.max(1,Math.min(60,+e.target.value||1)); };
-    el.querySelector('.go').onclick=()=>{ n=Math.max(1,Math.min(60,+el.querySelector('.cnt').value||1)); draw(shuffle(Array.from({length:n},(_,i)=>i+1))); };
+  function xOf(c){ return padX + c*colW; }
+  function rowY(r){ return lineTop+26 + r*rowH; }
+  function bottomY(){ return rowY(rungs.length-1)+26; }
+  function gen(){
+    const rows=Math.max(n+2,6);
+    rungs=[];
+    for(let r=0;r<rows;r++){
+      const row=[];
+      for(let i=0;i<n-1;i++){ row[i]=(!row[i-1] && Math.random()<0.45); }
+      rungs.push(row);
+    }
+    res=shuffle(Array.from({length:n},(_,i)=>i+1));
+    revealed={};
   }
-  draw(null);
+  function trace(c){
+    const pts=[[xOf(c),lineTop]];
+    for(let r=0;r<rungs.length;r++){
+      const y=rowY(r); pts.push([xOf(c),y]);
+      if(c>0 && rungs[r][c-1]){ c--; pts.push([xOf(c),y]); }
+      else if(c<n-1 && rungs[r][c]){ c++; pts.push([xOf(c),y]); }
+    }
+    pts.push([xOf(c),bottomY()]);
+    return {pts, end:c};
+  }
+  function draw(){
+    const W=padX*2 + (n-1)*colW, H=bottomY()+38;
+    el.innerHTML=`
+      <div class="badge">🥢 콩 옮기기</div>
+      <div class="ctrl">인원 수 <input type="number" class="cnt" min="1" max="16" value="${n}"> 명
+        <button class="btn p sm gen">🎲 새 사다리</button>
+        <button class="btn g sm all">👀 전체 공개</button></div>
+      <div class="laddwrap" style="overflow-x:auto; padding:8px 0;">
+        <svg id="ladd" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="max-width:100%; height:auto;"></svg>
+      </div>
+      <div id="laddres" class="hint" style="min-height:1.4rem; font-weight:700; color:var(--ink)"></div>
+      <p class="hint">위쪽 참가자를 누르면 사다리를 타고 내려가 젓가락 번호가 공개돼요. 🎲로 새 사다리!</p>`;
+    svg=el.querySelector('#ladd');
+    // 세로줄
+    for(let c=0;c<n;c++){ line(xOf(c),lineTop,xOf(c),bottomY(),'#cfeaf7',4); }
+    // 가로줄(사다리)
+    for(let r=0;r<rungs.length;r++){ for(let i=0;i<n-1;i++){ if(rungs[r][i]) line(xOf(i),rowY(r),xOf(i+1),rowY(r),'#7fcbec',4); } }
+    // 위 참가자 마커 / 아래 젓가락
+    for(let c=0;c<n;c++){
+      chip(xOf(c),lineTop,'#2aa9e0',String(c+1),true,c);
+      chip(xOf(c),bottomY(),'#ffb703','🥢'+res[c],false,c);
+    }
+    el.querySelector('.cnt').onchange=e=>{ n=Math.max(1,Math.min(16,+e.target.value||1)); gen(); draw(); };
+    el.querySelector('.gen').onclick=()=>{ gen(); draw(); };
+    el.querySelector('.all').onclick=()=>{ for(let c=0;c<n;c++) reveal(c,c*250); };
+  }
+  function line(x1,y1,x2,y2,color,w){ const l=document.createElementNS(NS,'line'); l.setAttribute('x1',x1); l.setAttribute('y1',y1); l.setAttribute('x2',x2); l.setAttribute('y2',y2); l.setAttribute('stroke',color); l.setAttribute('stroke-width',w); l.setAttribute('stroke-linecap','round'); svg.appendChild(l); }
+  function chip(x,y,color,label,clickable,c){
+    const g=document.createElementNS(NS,'g'); g.setAttribute('transform',`translate(${x},${y})`);
+    if(clickable){ g.style.cursor='pointer'; g.onclick=()=>reveal(c,0); }
+    const circ=document.createElementNS(NS,'circle'); circ.setAttribute('r',15); circ.setAttribute('fill',color); circ.setAttribute('stroke','#fff'); circ.setAttribute('stroke-width',3); g.appendChild(circ);
+    const t=document.createElementNS(NS,'text'); t.setAttribute('text-anchor','middle'); t.setAttribute('dy','.35em'); t.setAttribute('fill','#fff'); t.setAttribute('font-size','12'); t.setAttribute('font-weight','800'); t.textContent=label; g.appendChild(t);
+    svg.appendChild(g);
+  }
+  function reveal(c,delay){
+    if(revealed[c]) return;
+    revealed[c]=true;
+    const {pts,end}=trace(c);
+    const color=COLORS[c%COLORS.length];
+    const poly=document.createElementNS(NS,'polyline');
+    poly.setAttribute('points',pts.map(p=>p.join(',')).join(' '));
+    poly.setAttribute('fill','none'); poly.setAttribute('stroke',color); poly.setAttribute('stroke-width',5);
+    poly.setAttribute('stroke-linecap','round'); poly.setAttribute('stroke-linejoin','round');
+    let len=0; for(let i=1;i<pts.length;i++){ len+=Math.hypot(pts[i][0]-pts[i-1][0], pts[i][1]-pts[i-1][1]); }
+    poly.style.strokeDasharray=len; poly.style.strokeDashoffset=len; poly.style.transition='stroke-dashoffset 1s ease';
+    svg.appendChild(poly);
+    setTimeout(()=>requestAnimationFrame(()=>{ poly.style.strokeDashoffset=0; }), delay);
+    setTimeout(()=>{
+      const box=el.querySelector('#laddres');
+      const row=document.createElement('div');
+      row.innerHTML=`<span style="color:${color}">●</span> 참가자 ${c+1} &nbsp;→&nbsp; 🥢 ${res[end]}`;
+      box.appendChild(row);
+    }, delay+1000);
+  }
+  gen(); draw();
 })();
 </script>
 </body>
