@@ -99,5 +99,6 @@ a.btn { text-decoration:none; display:inline-block; }
 .bgmbar-vol input{ flex:1; }
 #bgmbar-dock{ position:fixed; right:12px; bottom:12px; z-index:9998; width:120px; height:68px; border-radius:10px; overflow:hidden; box-shadow:0 6px 18px rgba(14,58,82,.3); background:#000; }
 #bgmbar-dock[hidden]{ display:none; }
-.bgmbar-skip{ display:flex; gap:8px; margin:4px 0; }
-.bgmbar-skip .skip{ flex:1; border:none; background:#eaf6fc; color:var(--ink); border-radius:10px; padding:8px; cursor:pointer; font-weight:700; font-size:.9rem; }
+.bgmbar-skip{ display:flex; gap:8px; margin:4px 0; align-items:center; }
+.bgmbar-skip input{ flex:1; min-width:0; padding:7px; }
+.bgmbar-skip .skip, .bgmbar-skip .gobtn{ border:none; background:#eaf6fc; color:var(--ink); border-radius:10px; padding:8px 12px; cursor:pointer; font-weight:700; font-size:.9rem; white-space:nowrap; }
