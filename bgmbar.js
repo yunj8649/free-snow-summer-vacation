@@ -24,12 +24,15 @@
         ? items.map(x=>`<button class="bgmbar-item${cur===x.url?' on':''}" data-url="${(x.url||'').replace(/"/g,'&quot;')}">▶ ${x.label||'배경음'}</button>`).join('')
         : '<div class="bgmbar-empty">저장된 곡이 없어요.<br>🎵 BGM 탭에서 추가하세요.</div>')
       + '<div class="bgmbar-now" id="bgmbar-now"></div>'
-      + '<div class="bgmbar-skip"><button class="chp" data-dir="-1">⏮ 구간</button><button class="chp" data-dir="1">구간 ⏭</button></div>'
-      + '<div class="bgmbar-skip"><button class="skip" data-dir="-1">⏪</button><input class="skipN" type="number" min="1" value="60" title="건너뛸 초">초<button class="skip" data-dir="1">⏩</button></div>'
+      + '<div class="bgmbar-skip">'
+        + '<button class="chp" data-dir="-1">⏮ 이전 구간</button>'
+        + '<button class="skip" data-d="-60">⏪ 1분 전</button>'
+        + '<button class="skip" data-d="60">1분 후 ⏩</button>'
+        + '<button class="chp" data-dir="1">다음 구간 ⏭</button>'
+      + '</div>'
       + `<div class="bgmbar-vol">🔊 <input type="range" class="vol" min="0" max="1" step="0.05" value="${vol}"></div>`;
     m.querySelectorAll('.bgmbar-item[data-url]').forEach(b=>b.onclick=()=>play(b.dataset.url));
-    const skipN=()=>Math.max(1, +m.querySelector('.skipN').value||60);
-    m.querySelectorAll('.skip').forEach(b=>b.onclick=()=>BGM.seek((+b.dataset.dir)*skipN()));
+    m.querySelectorAll('.skip').forEach(b=>b.onclick=()=>BGM.seek(+b.dataset.d));
     m.querySelectorAll('.chp').forEach(b=>b.onclick=()=>chapterSkip(+b.dataset.dir));
     m.querySelector('.stop').onclick=()=>stop();
     m.querySelector('.vol').oninput=e=>{ vol=+e.target.value; localStorage.setItem(VKEY,vol); BGM.setVolume(vol); };
