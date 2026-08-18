@@ -18,9 +18,7 @@
 <script src="bgm.js"></script>
 <script src="bgmbar.js"></script>
 <script>
-  const inFlat=[];
-  for(const [cat,list] of Object.entries(INITIALS)) list.forEach(([q,a])=>inFlat.push({badge:cat, q, note:'', answer:a}));
-  makeQuiz('inStage', inFlat, it=> it.answer);
+  buildInitials('inStage');
 </script>
 </body>
 </html>
