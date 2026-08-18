@@ -21,13 +21,13 @@
   const el=document.getElementById('beanStage');
   const COLORS=['#ef476f','#0fb5a6','#ff9e00','#2aa9e0','#8338ec','#06a86b','#f15bb5','#3a86ff','#fb5607','#118ab2'];
   const TOOLS=[
-    {e:'🥢',n:'쇠젓가락'},{e:'🥢',n:'쇠젓가락'},
-    {e:'🎋',n:'장대 젓가락'},{e:'🎋',n:'장대 젓가락'},
-    {e:'🦀',n:'집게'},{e:'🦀',n:'집게'},
-    {e:'🍢',n:'이쑤시개'},{e:'🍢',n:'이쑤시개'},
-    {e:'🌳',n:'나무젓가락'},{e:'🌳',n:'나무젓가락'},
-    {e:'🥤',n:'빨대'},{e:'🥤',n:'빨대'},
-    {e:'🥄',n:'티스푼'},{e:'🥄',n:'티스푼'},
+    '쇠젓가락','쇠젓가락',
+    '장대 젓가락','장대 젓가락',
+    '집게','집게',
+    '이쑤시개','이쑤시개',
+    '나무젓가락','나무젓가락',
+    '빨대','빨대',
+    '티스푼','티스푼',
   ];
   const colW=64, rowH=34, padX=34, lineTop=60;
   let n=8, rungs=[], res=[], svg=null, revealed={};
@@ -59,15 +59,15 @@
   function draw(){
     const W=padX*2 + (n-1)*colW, H=bottomY()+38;
     el.innerHTML=`
-      <div class="badge">🥢 콩 옮기기</div>
+      <div class="badge">콩 옮기기</div>
       <div class="ctrl">인원 수 <input type="number" class="cnt" min="1" max="${TOOLS.length}" value="${n}"> 명
-        <button class="btn p sm gen">🎲 새 사다리</button>
-        <button class="btn g sm all">👀 전체 공개</button></div>
+        <button class="btn p sm gen">새 사다리</button>
+        <button class="btn g sm all">전체 공개</button></div>
       <div class="laddwrap" style="overflow-x:auto; padding:8px 0;">
         <svg id="ladd" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="max-width:100%; height:auto;"></svg>
       </div>
       <div id="laddres" class="hint" style="min-height:1.4rem; font-weight:700; color:var(--ink)"></div>
-      <p class="hint">위쪽 참가자를 누르면 사다리를 타고 내려가 젓가락 종류가 공개돼요. 🥢쇠 · 🎋장대 · 🦀집게 · 🍢이쑤시개 · 🌳나무 · 🥤빨대 · 🥄티스푼 (각 2세트) · 🎲로 새 사다리!</p>`;
+      <p class="hint">위쪽 참가자를 누르면 사다리를 타고 내려가 젓가락 종류가 공개돼요. 쇠젓가락 · 장대 젓가락 · 집게 · 이쑤시개 · 나무젓가락 · 빨대 · 티스푼 (각 2세트) · 새 사다리로 재배정!</p>`;
     svg=el.querySelector('#ladd');
     // 세로줄
     for(let c=0;c<n;c++){ line(xOf(c),lineTop,xOf(c),bottomY(),'#cfeaf7',4); }
@@ -76,7 +76,7 @@
     // 위 참가자 마커 / 아래 젓가락
     for(let c=0;c<n;c++){
       chip(xOf(c),lineTop,'#2aa9e0',String(c+1),true,c);
-      chip(xOf(c),bottomY(),'#ffb703',res[c].e,false,c);
+      toolLabel(xOf(c),bottomY(),res[c]);
     }
     el.querySelector('.cnt').onchange=e=>{ n=Math.max(1,Math.min(TOOLS.length,+e.target.value||1)); gen(); draw(); };
     el.querySelector('.gen').onclick=()=>{ gen(); draw(); };
@@ -89,6 +89,12 @@
     const circ=document.createElementNS(NS,'circle'); circ.setAttribute('r',15); circ.setAttribute('fill',color); circ.setAttribute('stroke','#fff'); circ.setAttribute('stroke-width',3); g.appendChild(circ);
     const t=document.createElementNS(NS,'text'); t.setAttribute('text-anchor','middle'); t.setAttribute('dy','.35em'); t.setAttribute('fill','#fff'); t.setAttribute('font-size','12'); t.setAttribute('font-weight','800'); t.textContent=label; g.appendChild(t);
     svg.appendChild(g);
+  }
+  function toolLabel(x,y,name){
+    const dot=document.createElementNS(NS,'circle'); dot.setAttribute('cx',x); dot.setAttribute('cy',y); dot.setAttribute('r',6); dot.setAttribute('fill','#ffb703'); dot.setAttribute('stroke','#fff'); dot.setAttribute('stroke-width',2); svg.appendChild(dot);
+    const t=document.createElementNS(NS,'text'); t.setAttribute('text-anchor','middle'); t.setAttribute('x',x); t.setAttribute('y',y+18); t.setAttribute('font-size','11'); t.setAttribute('font-weight','700'); t.setAttribute('fill','#0e3a52');
+    name.split(' ').forEach((p,i)=>{ const ts=document.createElementNS(NS,'tspan'); ts.setAttribute('x',x); ts.setAttribute('dy',i===0?0:12); ts.textContent=p; t.appendChild(ts); });
+    svg.appendChild(t);
   }
   function reveal(c,delay){
     if(revealed[c]) return;
@@ -106,7 +112,7 @@
     setTimeout(()=>{
       const box=el.querySelector('#laddres');
       const row=document.createElement('div');
-      row.innerHTML=`<span style="color:${color}">●</span> 참가자 ${c+1} &nbsp;→&nbsp; ${res[end].e} ${res[end].n}`;
+      row.innerHTML=`<span style="color:${color}">●</span> 참가자 ${c+1} &nbsp;→&nbsp; ${res[end]}`;
       box.appendChild(row);
     }, delay+1000);
   }
