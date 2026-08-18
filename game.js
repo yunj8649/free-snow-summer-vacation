@@ -1,5 +1,8 @@
 /* 여름 정모 레크레이션 - 공통 게임 로직 (data.js 를 먼저 로드해야 함) */
 function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+// 방문한 주제(딤 처리) 저장 — 화면 이동/새로고침해도 유지
+function loadVisited(key){ try{ return new Set(JSON.parse(localStorage.getItem(key))||[]); }catch(e){ return new Set(); } }
+function saveVisited(key,set){ localStorage.setItem(key, JSON.stringify([...set])); }
 
 // 문제 -> 정답 공개 -> 다음 (OX & 초성). 출제 수 지정 + 랜덤 뽑기. onBack 주면 "← 주제" 버튼 표시
 function makeQuiz(stageId, pool, renderAnswer, onBack){
@@ -35,7 +38,8 @@ function makeQuiz(stageId, pool, renderAnswer, onBack){
 function buildInitials(stageId){
   const el=document.getElementById(stageId);
   const cats=Object.keys(INITIALS);
-  const visited=new Set();
+  const VKEY='fss_vis_initials';
+  const visited=loadVisited(VKEY);
   function showCats(){
     el.innerHTML='<div class="badge">초성 맞추기 · 주제 선택</div>'
       + '<div class="catcards">'
@@ -43,8 +47,9 @@ function buildInitials(stageId){
       + '<button class="catcard rand" data-c="__rand">🎲 랜덤 주제<span>무작위</span></button>'
       + '</div>';
     el.querySelectorAll('.catcard').forEach(b=>b.onclick=()=>{
-      let cat=b.dataset.c; if(cat==='__rand') cat=cats[Math.floor(Math.random()*cats.length)];
-      visited.add(cat);
+      let cat=b.dataset.c;
+      if(cat==='__rand'){ const avail=cats.filter(c=>!visited.has(c)); if(!avail.length){ alert('모든 주제를 진행했어요!'); return; } cat=avail[Math.floor(Math.random()*avail.length)]; }
+      visited.add(cat); saveVisited(VKEY,visited);
       const pool=INITIALS[cat].map(([q,a])=>({badge:cat, q, note:'', answer:a}));
       makeQuiz(stageId, pool, it=>it.answer, showCats);
     });
@@ -56,7 +61,8 @@ function buildInitials(stageId){
 function buildCharades(stageId){
   const el=document.getElementById(stageId);
   const cats=Object.keys(CHARADES);
-  const visited=new Set();
+  const VKEY='fss_vis_charades';
+  const visited=loadVisited(VKEY);
   function showCats(){
     el.innerHTML='<div class="badge">몸으로 말해요 · 주제 선택</div>'
       + '<div class="catcards">'
@@ -64,8 +70,9 @@ function buildCharades(stageId){
       + '<button class="catcard rand" data-c="__rand">🎲 랜덤 주제<span>무작위</span></button>'
       + '</div>';
     el.querySelectorAll('.catcard').forEach(b=>b.onclick=()=>{
-      let c=b.dataset.c; if(c==='__rand') c=cats[Math.floor(Math.random()*cats.length)];
-      visited.add(c); startCat(c);
+      let c=b.dataset.c;
+      if(c==='__rand'){ const avail=cats.filter(x=>!visited.has(x)); if(!avail.length){ alert('모든 주제를 진행했어요!'); return; } c=avail[Math.floor(Math.random()*avail.length)]; }
+      visited.add(c); saveVisited(VKEY,visited); startCat(c);
     });
   }
   function startCat(cat){
