@@ -105,7 +105,6 @@
       const box=el.querySelector('#laddres');
       const row=document.createElement('div');
       row.className='rescard';
-      row.style.borderColor=color;
       row.innerHTML=`<span class="rescard-p" style="color:${color}">참가자 ${c+1}</span><span class="rescard-t">${res[end]}</span>`;
       box.appendChild(row);
     }, delay+1000);
