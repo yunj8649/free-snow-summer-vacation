@@ -123,9 +123,10 @@ a.btn { text-decoration:none; display:inline-block; }
 .beancard b{ display:block; font-size:1.8rem; color:var(--accent2); margin-top:4px; }
 .catcard.visited{ opacity:.5; filter:grayscale(.6); }
 .catcard.rand{ background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#5a3a00; }
-/* 사다리 결과 3열 박스 */
-.resgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:16px; }
-.rescard{ background:#f7fdff; border:3px solid var(--line); border-radius:14px; padding:12px 10px; text-align:center;
-  display:flex; flex-direction:column; gap:4px; box-shadow:0 3px 10px rgba(14,58,82,.1); }
-.rescard-p{ font-size:1rem; font-weight:800; }
-.rescard-t{ font-size:1.5rem; font-weight:900; color:var(--ink); word-break:keep-all; }
+/* 사다리 결과 한 박스 안에 3열 나열 */
+.resgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px 16px; margin-top:16px;
+  background:#f7fdff; border:3px solid var(--line); border-radius:16px; padding:16px 18px; box-shadow:0 3px 10px rgba(14,58,82,.1); }
+.resgrid:empty{ display:none; }
+.rescard{ display:flex; align-items:baseline; gap:8px; padding:4px 2px; border-bottom:1px dashed var(--line); }
+.rescard-p{ font-size:1rem; font-weight:800; white-space:nowrap; }
+.rescard-t{ font-size:1.4rem; font-weight:900; color:var(--ink); word-break:keep-all; }
