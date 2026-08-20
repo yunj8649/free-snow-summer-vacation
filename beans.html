@@ -55,7 +55,8 @@
       <div class="badge">콩 옮기기</div>
       <div class="ctrl">인원 수 <input type="number" class="cnt" min="1" max="${TOOLS.length}" value="${n}"> 명
         <button class="btn p sm gen">새 사다리</button>
-        <button class="btn g sm all">전체 공개</button></div>
+        <button class="btn g sm all">전체 공개</button>
+        <button class="btn g sm totimer">순서 타이머 ▶</button></div>
       <div class="laddwrap" style="overflow-x:auto; padding:8px 0;">
         <svg id="ladd" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="max-width:100%; height:auto;"></svg>
       </div>
@@ -74,6 +75,7 @@
     el.querySelector('.cnt').onchange=e=>{ n=Math.max(1,Math.min(TOOLS.length,+e.target.value||1)); gen(); draw(); };
     el.querySelector('.gen').onclick=()=>{ gen(); draw(); };
     el.querySelector('.all').onclick=()=>{ for(let c=0;c<n;c++) reveal(c,c*250); };
+    el.querySelector('.totimer').onclick=()=>{ document.getElementById('timerStage').scrollIntoView({behavior:'smooth'}); };
   }
   function line(x1,y1,x2,y2,color,w){ const l=document.createElementNS(NS,'line'); l.setAttribute('x1',x1); l.setAttribute('y1',y1); l.setAttribute('x2',x2); l.setAttribute('y2',y2); l.setAttribute('stroke',color); l.setAttribute('stroke-width',w); l.setAttribute('stroke-linecap','round'); svg.appendChild(l); }
   function chip(x,y,color,label,clickable,c){
