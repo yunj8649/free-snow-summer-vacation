@@ -75,15 +75,29 @@ function buildCharades(stageId){
       visited.add(c); saveVisited(VKEY,visited); startCat(c);
     });
   }
+  function mmss(s){ const m=Math.floor(s/60), ss=s%60; return String(m).padStart(2,'0')+':'+String(ss).padStart(2,'0'); }
+  function beepCh(){ try{ const ac=new (window.AudioContext||window.webkitAudioContext)(); for(let k=0;k<3;k++){ const t=ac.currentTime+k*0.22, o=ac.createOscillator(), g=ac.createGain(); o.connect(g); g.connect(ac.destination); o.type='square'; o.frequency.value=1046; g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.7,t+0.01); g.gain.exponentialRampToValueAtTime(.0001,t+0.18); o.start(t); o.stop(t+0.2); } }catch(e){} }
   function startCat(cat){
     const MAX=CHARADES[cat].length;
     let count=MAX, passMax=3, passLeft=3, order=[], i=0;
-    function rebuild(){ order=shuffle(CHARADES[cat]).slice(0,count); i=0; passLeft=passMax; draw(); }
+    let dur=180, remain=180, trunning=false, ttick=null;
+    function stopT(){ if(ttick){ clearInterval(ttick); ttick=null; } trunning=false; }
+    function toggleT(){
+      trunning=!trunning;
+      if(trunning){ ttick=setInterval(()=>{ remain--; if(remain<=0){ beepCh(); stopT(); draw(); return; } const t=document.getElementById('chTime'); if(t){ t.textContent=mmss(remain); t.style.color=remain<=10?'#ef476f':'var(--ink)'; } },1000); }
+      else stopT();
+      draw();
+    }
+    function rebuild(){ order=shuffle(CHARADES[cat]).slice(0,count); i=0; passLeft=passMax; stopT(); remain=dur; draw(); }
     function draw(){
       el.innerHTML=`
         <div class="ctrl"><button class="btn g sm backcat">← 주제</button>
           제시어 수 <input type="number" class="cnt" min="1" max="${MAX}" value="${count}"> / ${MAX}개
           &nbsp;·&nbsp; 패스권 <input type="number" class="pass" min="0" max="20" value="${passMax}">개</div>
+        <div class="ctrl">⏱ 주제 타이머 <input type="number" class="tmin" min="1" max="30" step="0.5" value="${dur/60}"> 분
+          <button class="btn p sm tgo">${trunning?'⏸ 정지':'▶ 시작'}</button>
+          <button class="btn g sm trs">↺</button>
+          <span id="chTime" style="font-size:1.4rem; font-weight:900; color:${remain<=10?'#ef476f':'var(--ink)'}">${mmss(remain)}</span></div>
         <div class="badge">${cat}</div>
         <div class="qtext">${order[i]}</div>
         <div class="counter">${i+1} / ${order.length} · 🎟️ 패스 ${passLeft}/${passMax}</div>
@@ -93,7 +107,10 @@ function buildCharades(stageId){
           <button class="btn p" id="n" ${i>=order.length-1?'disabled':''}>다음 제시어 ▶</button>
         </div>
         <p class="hint">제시어를 몸으로만 표현하세요! 화면은 연기자만 보게 하세요 🙈</p>`;
-      el.querySelector('.backcat').onclick=showCats;
+      el.querySelector('.backcat').onclick=()=>{ stopT(); showCats(); };
+      el.querySelector('.tmin').onchange=e=>{ dur=Math.round(Math.max(1,Math.min(30,+e.target.value||1))*60); stopT(); remain=dur; draw(); };
+      el.querySelector('.tgo').onclick=toggleT;
+      el.querySelector('.trs').onclick=()=>{ stopT(); remain=dur; draw(); };
       el.querySelector('.cnt').onchange=e=>{ count=Math.max(1,Math.min(MAX,+e.target.value||1)); rebuild(); };
       el.querySelector('.pass').onchange=e=>{ passMax=Math.max(0,Math.min(20,+e.target.value||0)); passLeft=passMax; draw(); };
       el.querySelector('#p').onclick=()=>{ if(i<=0) return; i--; draw(); };
