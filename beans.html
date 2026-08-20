@@ -11,6 +11,7 @@
   <div class="card">
     <a class="btn g sm back-link" href="./index.html">← 진행 순서</a>
     <div class="stage" id="beanStage"></div>
+    <div class="stage" id="timerStage"></div>
   </div>
 </main>
 <script src="bgm.js"></script>
@@ -110,6 +111,46 @@
     }, delay+1000);
   }
   gen(); draw();
+})();
+</script>
+<script>
+/* 일렬 순서 진행 타이머: 1명씩 정해진 시간(기본 20초) 카운트다운, 0초 되면 삐 소리 + 다음 사람으로 자동 넘김, 마지막이면 처음으로 순환 */
+(function(){
+  const el=document.getElementById('timerStage');
+  let people=8, secs=20, cur=0, remain=20, running=false, tick=null;
+  function beep(){ try{ const ac=new (window.AudioContext||window.webkitAudioContext)(); const o=ac.createOscillator(), g=ac.createGain(); o.connect(g); g.connect(ac.destination); o.type='square'; o.frequency.value=880; g.gain.setValueAtTime(.3,ac.currentTime); g.gain.exponentialRampToValueAtTime(.01,ac.currentTime+.5); o.start(); o.stop(ac.currentTime+.5); }catch(e){} }
+  function mmss(s){ const m=Math.floor(s/60), ss=s%60; return String(m).padStart(2,'0')+':'+String(ss).padStart(2,'0'); }
+  function next(){ cur=(cur+1)%people; remain=secs; paint(); }
+  function stopTick(){ if(tick){ clearInterval(tick); tick=null; } }
+  function toggle(){
+    running=!running;
+    if(running){ tick=setInterval(()=>{ remain--; if(remain<=0){ beep(); next(); return; } paint(); }, 1000); }
+    else stopTick();
+    paint();
+  }
+  function reset(){ running=false; stopTick(); cur=0; remain=secs; paint(); }
+  function paint(){
+    el.innerHTML=`
+      <div class="badge">순서 타이머</div>
+      <div class="ctrl">1인당 <input type="number" class="tsec" min="1" max="600" value="${secs}"> 초
+        &nbsp;·&nbsp; 인원 <input type="number" class="tppl" min="1" max="30" value="${people}"> 명</div>
+      <div style="text-align:center; margin:14px 0;">
+        <div style="font-size:1.6rem; font-weight:800; color:var(--teal)">${cur+1}번 차례</div>
+        <div style="font-size:4rem; font-weight:900; color:${remain<=5?'#ef476f':'var(--ink)'}; line-height:1.1">${mmss(remain)}</div>
+      </div>
+      <div class="nav2">
+        <button class="btn p" id="tgo">${running?'⏸ 일시정지':'▶ 시작'}</button>
+        <button class="btn g" id="tnext">다음 사람 ▶</button>
+        <button class="btn g" id="trst">↺ 리셋</button>
+      </div>
+      <p class="hint">일렬로 줄 서서 ${cur+1}번부터 한 명씩 ${secs}초 안에! 시간이 끝나면 삐 소리와 함께 다음 사람으로 넘어가요. 마지막 사람 다음엔 다시 1번으로.</p>`;
+    el.querySelector('.tsec').onchange=e=>{ secs=Math.max(1,Math.min(600,+e.target.value||1)); remain=secs; running=false; stopTick(); paint(); };
+    el.querySelector('.tppl').onchange=e=>{ people=Math.max(1,Math.min(30,+e.target.value||1)); cur=0; running=false; stopTick(); paint(); };
+    el.querySelector('#tgo').onclick=toggle;
+    el.querySelector('#tnext').onclick=()=>{ remain=secs; next(); };
+    el.querySelector('#trst').onclick=reset;
+  }
+  paint();
 })();
 </script>
 </body>
