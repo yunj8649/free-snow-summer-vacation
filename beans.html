@@ -120,7 +120,17 @@
 (function(){
   const el=document.getElementById('timerStage');
   let people=8, secs=20, cur=0, remain=20, running=false, tick=null;
-  function beep(){ try{ const ac=new (window.AudioContext||window.webkitAudioContext)(); const o=ac.createOscillator(), g=ac.createGain(); o.connect(g); g.connect(ac.destination); o.type='square'; o.frequency.value=880; g.gain.setValueAtTime(.3,ac.currentTime); g.gain.exponentialRampToValueAtTime(.01,ac.currentTime+.5); o.start(); o.stop(ac.currentTime+.5); }catch(e){} }
+  function beep(){ try{
+    const ac=new (window.AudioContext||window.webkitAudioContext)();
+    // 삐-삐-삐 3연타 알람 (더 크고 눈에 띄게)
+    for(let k=0;k<3;k++){
+      const t=ac.currentTime+k*0.22, o=ac.createOscillator(), g=ac.createGain();
+      o.connect(g); g.connect(ac.destination); o.type='square'; o.frequency.value=1046;
+      g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.7,t+0.01);
+      g.gain.exponentialRampToValueAtTime(.0001,t+0.18);
+      o.start(t); o.stop(t+0.2);
+    }
+  }catch(e){} }
   function mmss(s){ const m=Math.floor(s/60), ss=s%60; return String(m).padStart(2,'0')+':'+String(ss).padStart(2,'0'); }
   function next(){ cur=(cur+1)%people; remain=secs; paint(); }
   function stopTick(){ if(tick){ clearInterval(tick); tick=null; } }
