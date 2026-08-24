@@ -82,7 +82,7 @@ const save=s=>localStorage.setItem(KEY,JSON.stringify(s));
 let state=load(); // {teams:[{name}], scores:[[..게임수]], cheer:[숫자], revealed:[bool]}
 if(!state.revealed) state.revealed=GAMES.map(()=>false);
 if(!state.cheer) state.cheer=[];
-const CHEER_SCORE=10; // 📣 응원(분위기) 보너스 최대 점수
+const CHEER_SCORE=20; // 📣 응원(분위기) 보너스 최대 점수
 
 /* ---------- tabs ---------- */
 function activate(id){
