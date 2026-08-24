@@ -156,7 +156,7 @@ function renderScore(){
     document.getElementById('winner').innerHTML=''; return; }
   no.style.display='none';
   document.getElementById('sbHead').innerHTML=
-    `<tr><th>팀</th>${GAMES.map(g=>`<th>${g.emoji}<br><span class="hint">${g.score}</span></th>`).join('')}<th>📣<br><span class="hint">응원 ${CHEER_SCORE}</span></th><th>합계</th></tr>`;
+    `<tr><th>팀</th>${GAMES.map(g=>`<th>${g.name}<br><span class="hint">${g.score}</span></th>`).join('')}<th>응원<br><span class="hint">${CHEER_SCORE}</span></th><th>합계</th></tr>`;
   const totals=state.teams.map((_,ti)=>state.scores[ti].reduce((a,b)=>a+(+b||0),0)+(+state.cheer[ti]||0));
   const ranked=[...totals].map((t,i)=>({t,i})).sort((a,b)=>b.t-a.t);
   const rankOf={}; let prev=null,r=0;
