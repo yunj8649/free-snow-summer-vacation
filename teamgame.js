@@ -46,12 +46,15 @@
     // ---------- 설정 ----------
     function setup(){
       stopTick();
+      st.names=loadTeams()||st.names;
+      if(st.order.length!==nT()) st.order=Array.from({length:nT()},(_,i)=>i);
       const teamsSet=!!loadTeams();
       el.innerHTML=`<div class="tg-card">
         <div class="tg-title">${cfg.emoji||''} ${esc(cfg.title||'게임')}</div>
-        <div class="tg-label">참가 팀</div>
-        <div class="tg-teams">${st.names.map((n,i)=>`<span class="tg-teamtag" style="background:${tc(i).pill};color:${tc(i).text}">${esc(n)}</span>`).join('')}</div>
-        <div class="tg-teamnote">${teamsSet?'홈 점수판에 설정한 팀이에요. 바꾸려면 진행 순서 화면에서 수정하세요.':'홈 점수판에 팀이 없어 임시로 2팀으로 진행해요. 진행 순서 화면에서 팀을 설정하면 반영돼요.'}</div>
+        <div class="tg-label">참가 팀 · 진행 순서</div>
+        <div class="tg-teams">${st.order.map((ti,k)=>`<span class="tg-teamtag" style="background:${tc(ti).pill};color:${tc(ti).text}">${k+1}. ${esc(tname(ti))}</span>`).join('')}</div>
+        <button class="tg-seg" id="shuffleBtn" style="margin-top:10px">🔀 순서 랜덤</button>
+        <div class="tg-teamnote">${teamsSet?'홈 점수판 팀이에요. 순서를 섞은 뒤 시작하세요.':'홈에 팀이 없어 임시 2팀으로 진행해요. 진행 순서 화면에서 팀을 설정하면 반영돼요.'}</div>
         <div class="tg-label">한 팀당 시간</div>
         <div class="tg-row" id="timeRow">${timeOpts.map(t=>`<button class="tg-seg${t===st.timePer?' on':''}" data-s="${t}">${t}초</button>`).join('')}</div>
         <div class="tg-label">카드 덱</div>
@@ -62,6 +65,7 @@
         <button class="tg-cta" id="startBtn">게임 시작</button>
         ${cfg.footer?`<div class="tg-foot">${cfg.footer}</div>`:''}
       </div>`;
+      el.querySelector('#shuffleBtn').onclick=()=>{ st.order=shuffle(st.order); setup(); };
       el.querySelectorAll('#timeRow .tg-seg').forEach(b=>b.onclick=()=>{ st.timePer=+b.dataset.s; setup(); });
       el.querySelectorAll('#deckRow .tg-chip').forEach(b=>b.onclick=()=>{
         const d=b.dataset.d;
@@ -72,7 +76,8 @@
       el.querySelector('#startBtn').onclick=()=>{
         if(st.sel.size===0){ alert('카드 덱을 하나 이상 선택하세요.'); return; }
         st.names=loadTeams()||st.names; st.scores=Array(nT()).fill(0); st.round=1;
-        st.order=shuffle(Array.from({length:nT()},(_,i)=>i)); st.pos=0; st.team=st.order[0]; ready();
+        if(st.order.length!==nT()) st.order=Array.from({length:nT()},(_,i)=>i);
+        st.pos=0; st.team=st.order[0]; ready();
       };
     }
 
@@ -158,7 +163,7 @@
         el.querySelector('#next').onclick=()=>{ st.pos++; st.team=st.order[st.pos]; ready(); };
       } else {
         brow.innerHTML=`<button class="tg-cta" style="margin:0" id="more">한 바퀴 더</button><button class="tg-secondary" id="fin">최종 결과 보기</button>`;
-        el.querySelector('#more').onclick=()=>{ st.round++; st.order=shuffle(Array.from({length:nT()},(_,i)=>i)); st.pos=0; st.team=st.order[0]; ready(); };
+        el.querySelector('#more').onclick=()=>{ st.round++; st.pos=0; st.team=st.order[0]; ready(); };
         el.querySelector('#fin').onclick=()=>final();
       }
       el.querySelector('#end').onclick=()=>final();
