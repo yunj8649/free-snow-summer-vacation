@@ -35,7 +35,7 @@
     const PPC=cfg.pointsPerCorrect||1, PASS=cfg.passesPerTurn==null?3:cfg.passesPerTurn;
     const timeOpts=cfg.timeOptions||[60,90,120];
     const st={ names:loadTeams()||['1팀','2팀'], timePer:timeOpts[0], sel:new Set(),
-      scores:[], round:1, team:0, order:[], pos:0,
+      scores:[], round:1, team:0, order:[], pos:0, usedThisRound:new Set(),
       queue:[], qi:0, turnScore:0, turnWords:[], passLeft:0, remain:0, tick:null, revealed:false };
     const nT=()=>st.names.length;
     const tname=i=>st.names[i]||`${i+1}팀`;
@@ -64,7 +64,7 @@
       el.querySelector('#startBtn').onclick=()=>{
         st.names=loadTeams()||st.names; st.scores=Array(nT()).fill(0); st.round=1;
         if(st.order.length!==nT()) st.order=Array.from({length:nT()},(_,i)=>i);
-        st.pos=0; st.team=st.order[0]; ready();
+        st.usedThisRound=new Set(); st.pos=0; st.team=st.order[0]; ready();
       };
     }
 
@@ -76,6 +76,10 @@
     }
     function ready(){
       stopTick();
+      // 이번 바퀴에 이미 쓴 주제는 비활성화 (전부 소진되면 초기화)
+      let avail=deckNames.filter(n=>!st.usedThisRound.has(n));
+      if(avail.length===0){ st.usedThisRound.clear(); avail=deckNames.slice(); }
+      st.sel=new Set([...st.sel].filter(n=>avail.includes(n)));
       el.innerHTML=`<div class="tg-card tg-ready">
         <span class="tg-badge">${st.round}바퀴</span>
         <div class="tg-emoji">${cfg.emoji||'🎮'}</div>
@@ -83,14 +87,15 @@
         ${scoreChips(st.team)}
         <div class="tg-label" style="margin-top:18px">주제 선택</div>
         <div class="tg-row" id="deckRow">
-          <button class="tg-chip${st.sel.size===deckNames.length?' on':''}" data-d="__all">🎲 전체 랜덤</button>
-          ${deckNames.map(n=>`<button class="tg-chip${st.sel.has(n)?' on':''}" data-d="${esc(n)}">${esc(n)}</button>`).join('')}
+          <button class="tg-chip${(avail.length&&avail.every(n=>st.sel.has(n)))?' on':''}" data-d="__all">🎲 전체 랜덤</button>
+          ${deckNames.map(n=>{ const used=st.usedThisRound.has(n); return `<button class="tg-chip${st.sel.has(n)?' on':''}" data-d="${esc(n)}"${used?' disabled':''}>${esc(n)}</button>`; }).join('')}
         </div>
         <button class="tg-cta" id="go">시작!</button>
       </div>`;
       el.querySelectorAll('#deckRow .tg-chip').forEach(b=>b.onclick=()=>{
+        if(b.disabled) return;
         const d=b.dataset.d;
-        if(d==='__all'){ if(st.sel.size===deckNames.length) st.sel.clear(); else st.sel=new Set(deckNames); }
+        if(d==='__all'){ if(avail.every(n=>st.sel.has(n))) st.sel.clear(); else st.sel=new Set(avail); }
         else { if(st.sel.has(d)) st.sel.delete(d); else st.sel.add(d); }
         ready();
       });
@@ -99,6 +104,7 @@
 
     // ---------- 플레이 ----------
     function playStart(){
+      st.sel.forEach(d=>st.usedThisRound.add(d));   // 이번 바퀴에서 이 주제들은 소진
       st.queue=shuffle(pool()); st.qi=0; st.turnScore=0; st.turnWords=[]; st.passLeft=PASS; st.remain=st.timePer; st.revealed=false;
       draw();
       st.tick=setInterval(()=>{ st.remain--; if(st.remain<=0){ beep(); stopTick(); return turnResult(); } paintTimer(); }, 1000);
@@ -160,7 +166,7 @@
         el.querySelector('#next').onclick=()=>{ st.pos++; st.team=st.order[st.pos]; ready(); };
       } else {
         brow.innerHTML=`<button class="tg-cta" style="margin:0" id="more">한 바퀴 더</button><button class="tg-secondary" id="fin">최종 결과 보기</button>`;
-        el.querySelector('#more').onclick=()=>{ st.round++; st.pos=0; st.team=st.order[0]; ready(); };
+        el.querySelector('#more').onclick=()=>{ st.round++; st.usedThisRound=new Set(); st.pos=0; st.team=st.order[0]; ready(); };
         el.querySelector('#fin').onclick=()=>final();
       }
       el.querySelector('#end').onclick=()=>final();
