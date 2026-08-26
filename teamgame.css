@@ -43,6 +43,7 @@
 .tg-timer.low{ color:var(--hot); }
 .tg-bar{ height:12px; background:var(--line); border-radius:99px; overflow:hidden; margin-bottom:18px; }
 .tg-barfill{ height:100%; background:linear-gradient(135deg,var(--teal),var(--sky)); border-radius:99px; transition:width 1s linear; }
+.tg-topic{ text-align:center; color:var(--mut); font-weight:800; font-size:1rem; margin:2px 0 8px; }
 .tg-wordcard{ background:linear-gradient(135deg,#eafaff,#f2fdfb); border:2px solid var(--line); border-radius:20px;
   min-height:clamp(180px,38vh,440px); display:flex; align-items:center; justify-content:center; text-align:center; padding:20px; }
 .tg-word{ font-size:clamp(2.4rem,8vw,4.6rem); font-weight:800; line-height:1.15; word-break:keep-all; color:var(--ink); }
