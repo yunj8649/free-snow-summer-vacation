@@ -36,15 +36,15 @@
   function render(){
     el.innerHTML=`
       <div class="badge">콩 옮기기</div>
-      <button class="btn p draw" style="width:100%; font-size:1.35rem; padding:18px; margin-top:6px;">🎲 대진 뽑기</button>
-      <div id="drawres" class="resgrid"></div>
-      <p class="hint" style="margin-top:18px;">각 팀에 아래 도구들을 나눠주세요. 팀 안에서 누가 어떤 도구를 쓸지는 자유롭게 정하면 돼요!<br>2팀씩 짝지어 진행하고, <b>콩을 가장 많이 옮긴 한 팀이 우승</b>이에요.</p>
-      <div style="display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin:10px 0 18px;">
-        ${TOOLS.map(t=>`<span style="background:#eafaff; border:1.5px solid var(--line); color:var(--mut); font-weight:700; padding:5px 11px; border-radius:14px; font-size:.85rem;">${t}</span>`).join('')}
-      </div>
+      <p class="hint">각 팀에 아래 도구들을 나눠주세요. 팀 안에서 누가 어떤 도구를 쓸지는 자유롭게 정하면 돼요!<br>2팀씩 짝지어 진행하고, <b>콩을 가장 많이 옮긴 한 팀이 우승</b>이에요.</p>
       <div class="ctrl" style="justify-content:center;">
+        <button class="btn p sm draw">🎲 대진 뽑기</button>
         <button class="btn g sm totimer">순서 타이머 ▶</button>
         <button class="btn g sm toladder">🪜 사다리타기</button>
+      </div>
+      <div id="drawres" class="resgrid"></div>
+      <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:20px 0 6px;">
+        ${TOOLS.map(t=>`<span style="background:#eafaff; border:2px solid var(--line); color:var(--ink); font-weight:800; padding:12px 18px; border-radius:20px; font-size:1.15rem;">${t}</span>`).join('')}
       </div>`;
     el.querySelector('.totimer').onclick=()=>{ el.hidden=true; document.getElementById('timerStage').hidden=false; };
     el.querySelector('.toladder').onclick=()=>{ el.hidden=true; document.getElementById('ladderStage').hidden=false; };
