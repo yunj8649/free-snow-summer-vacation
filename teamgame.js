@@ -52,7 +52,7 @@
       el.innerHTML=`<div class="tg-card">
         <div class="tg-title">${cfg.emoji||''} ${esc(cfg.title||'게임')}</div>
         <div class="tg-label">참가 팀 · 진행 순서</div>
-        <div class="tg-teams"><button class="tg-shuffle" id="shuffleBtn">🔀 순서</button>${st.order.map((ti,k)=>`<span class="tg-teamtag" style="background:${tc(ti).pill};color:${tc(ti).text}">${k+1}. ${esc(tname(ti))}</span>`).join('')}</div>
+        <div class="tg-teams"><button class="tg-shuffle" id="shuffleBtn">🔀 순서</button>${st.order.map(ti=>`<span class="tg-teamtag" style="background:${tc(ti).pill};color:${tc(ti).text}">${esc(tname(ti))}</span>`).join('')}</div>
         <div class="tg-teamnote">${teamsSet?'홈 점수판 팀이에요. 순서를 섞은 뒤 시작하세요.':'홈에 팀이 없어 임시 2팀으로 진행해요. 진행 순서 화면에서 팀을 설정하면 반영돼요.'}</div>
         <div class="tg-label">한 팀당 시간</div>
         <div class="tg-row" id="timeRow">${timeOpts.map(t=>`<button class="tg-seg${t===st.timePer?' on':''}" data-s="${t}">${t}초</button>`).join('')}</div>
@@ -82,8 +82,8 @@
 
     // ---------- 팀 차례(준비) ----------
     function scoreChips(active){
-      return `<div class="tg-scorechips">${st.scores.map((s,i)=>{ const c=tc(i);
-        return `<span class="tg-scorechip${i===active?' active':''}" style="background:${c.pill};color:${c.text}">${esc(tname(i))} ${s}</span>`;
+      return `<div class="tg-scorechips">${st.order.map(i=>{ const c=tc(i);
+        return `<span class="tg-scorechip${i===active?' active':''}" style="background:${c.pill};color:${c.text}">${esc(tname(i))} ${st.scores[i]}</span>`;
       }).join('')}</div>`;
     }
     function ready(){
