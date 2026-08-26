@@ -5,20 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>몸으로 말해요</title>
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="teamgame.css">
 </head>
-<body>
-<main class="gamepage">
-  <div class="card">
-    <a class="btn g sm back-link" href="./index.html">← 진행 순서</a>
-    <div class="stage" id="chStage"></div>
-  </div>
-</main>
+<body class="tg-body">
+<div class="tg-wrap">
+  <a class="tg-back" href="./index.html">← 진행 순서</a>
+  <div id="chStage"></div>
+</div>
 <script src="data.js"></script>
-<script src="game.js"></script>
+<script src="teamgame.js"></script>
 <script src="bgm.js"></script>
 <script src="bgmbar.js"></script>
 <script>
-  buildCharades('chStage');
+  TeamGame.start('chStage', {
+    title:'몸으로 말해요', emoji:'🎭',
+    decks: CHARADES,
+    footer:'말하지 않고 몸짓으로만! 정답 ○ · 패스 ✕ (턴당 최대 3번)',
+    correctLabel:'○ 정답', passLabel:'✕ 패스',
+    pointsPerCorrect:1, passesPerTurn:3,
+    teamOptions:[2,3,4], timeOptions:[60,90,120],
+  });
 </script>
 </body>
 </html>
