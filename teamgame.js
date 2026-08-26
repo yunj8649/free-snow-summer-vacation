@@ -56,24 +56,12 @@
         <div class="tg-teamnote">${teamsSet?'홈 점수판 팀이에요. 순서를 섞은 뒤 시작하세요.':'홈에 팀이 없어 임시 2팀으로 진행해요. 진행 순서 화면에서 팀을 설정하면 반영돼요.'}</div>
         <div class="tg-label">한 팀당 시간</div>
         <div class="tg-row" id="timeRow">${timeOpts.map(t=>`<button class="tg-seg${t===st.timePer?' on':''}" data-s="${t}">${t}초</button>`).join('')}</div>
-        <div class="tg-label">주제</div>
-        <div class="tg-row" id="deckRow">
-          <button class="tg-chip${st.sel.size===deckNames.length?' on':''}" data-d="__all">🎲 전체 랜덤</button>
-          ${deckNames.map(n=>`<button class="tg-chip${st.sel.has(n)?' on':''}" data-d="${esc(n)}">${esc(n)}</button>`).join('')}
-        </div>
         <button class="tg-cta" id="startBtn">게임 시작</button>
         ${cfg.footer?`<div class="tg-foot">${cfg.footer}</div>`:''}
       </div>`;
       el.querySelector('#shuffleBtn').onclick=()=>{ st.order=shuffle(st.order); setup(); };
       el.querySelectorAll('#timeRow .tg-seg').forEach(b=>b.onclick=()=>{ st.timePer=+b.dataset.s; setup(); });
-      el.querySelectorAll('#deckRow .tg-chip').forEach(b=>b.onclick=()=>{
-        const d=b.dataset.d;
-        if(d==='__all'){ if(st.sel.size===deckNames.length) st.sel.clear(); else st.sel=new Set(deckNames); }
-        else { if(st.sel.has(d)) st.sel.delete(d); else st.sel.add(d); }
-        setup();
-      });
       el.querySelector('#startBtn').onclick=()=>{
-        if(st.sel.size===0){ alert('카드 덱을 하나 이상 선택하세요.'); return; }
         st.names=loadTeams()||st.names; st.scores=Array(nT()).fill(0); st.round=1;
         if(st.order.length!==nT()) st.order=Array.from({length:nT()},(_,i)=>i);
         st.pos=0; st.team=st.order[0]; ready();
@@ -93,9 +81,20 @@
         <div class="tg-emoji">${cfg.emoji||'🎮'}</div>
         <div class="tg-heading" style="color:${tc(st.team).text}">${esc(tname(st.team))} 차례!</div>
         ${scoreChips(st.team)}
+        <div class="tg-label" style="margin-top:18px">주제 선택</div>
+        <div class="tg-row" id="deckRow">
+          <button class="tg-chip${st.sel.size===deckNames.length?' on':''}" data-d="__all">🎲 전체 랜덤</button>
+          ${deckNames.map(n=>`<button class="tg-chip${st.sel.has(n)?' on':''}" data-d="${esc(n)}">${esc(n)}</button>`).join('')}
+        </div>
         <button class="tg-cta" id="go">시작!</button>
       </div>`;
-      el.querySelector('#go').onclick=()=>playStart();
+      el.querySelectorAll('#deckRow .tg-chip').forEach(b=>b.onclick=()=>{
+        const d=b.dataset.d;
+        if(d==='__all'){ if(st.sel.size===deckNames.length) st.sel.clear(); else st.sel=new Set(deckNames); }
+        else { if(st.sel.has(d)) st.sel.delete(d); else st.sel.add(d); }
+        ready();
+      });
+      el.querySelector('#go').onclick=()=>{ if(st.sel.size===0){ alert('주제를 하나 이상 선택하세요.'); return; } playStart(); };
     }
 
     // ---------- 플레이 ----------
