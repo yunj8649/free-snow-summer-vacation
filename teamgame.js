@@ -40,7 +40,7 @@
     const nT=()=>st.names.length;
     const tname=i=>st.names[i]||`${i+1}팀`;
     const tc=i=>TEAMC[i%TEAMC.length];
-    const pool=()=>{ let a=[]; st.sel.forEach(n=> a=a.concat(cfg.decks[n]||[])); return a; };
+    const pool=()=>{ const a=[]; st.sel.forEach(n=>{ (cfg.decks[n]||[]).forEach(it=>a.push({it,deck:n})); }); return a; };
     function stopTick(){ if(st.tick){ clearInterval(st.tick); st.tick=null; } }
 
     // ---------- 설정 ----------
@@ -110,7 +110,7 @@
       const f=el.querySelector('#tgF'); if(f) f.style.width=Math.max(0,st.remain/st.timePer*100)+'%';
     }
     function draw(){
-      const c=tc(st.team); const it=cur();
+      const c=tc(st.team); const entry=cur(); const it=entry.it;
       const showReveal = reveal && !st.revealed;
       const answerHtml = reveal ? (st.revealed?`<small>${reveal(it)}</small>`:'') : '';
       el.innerHTML=`<div class="tg-card">
@@ -120,6 +120,7 @@
           <div class="tg-timer" id="tgT">${st.remain}</div>
         </div>
         <div class="tg-bar"><div class="tg-barfill" id="tgF" style="width:${st.remain/st.timePer*100}%"></div></div>
+        <div class="tg-topic">${esc(entry.deck)}</div>
         <div class="tg-wordcard"><div class="tg-word">${render(it)}${answerHtml}</div></div>
         ${showReveal?`<button class="tg-revbtn" id="rev">정답 공개</button>`:''}
         <div class="tg-actions">
