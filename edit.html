@@ -171,7 +171,7 @@ $('btnExport').onclick=()=>{
   $('out').scrollIntoView({behavior:'smooth'});
 };
 $('btnApply').onclick=()=>{ localStorage.setItem('fss_override', JSON.stringify(buildData())); $('status').textContent='✅ 이 기기에 적용했어요. 게임 화면에 바로 반영돼요.'; };
-$('btnReset').onclick=()=>{ if(!confirm('임시저장을 지우고 기본값(data.js)에서 새로 시작할까요?')) return; localStorage.removeItem(DRAFT); model=fromData(); render(); $('status').textContent='기본값에서 새로 시작했어요.'; };
+$('btnReset').onclick=()=>{ if(!confirm('임시저장과 이 기기 적용본을 모두 지우고 기본값(data.js)에서 새로 시작할까요?')) return; localStorage.removeItem(DRAFT); localStorage.removeItem('fss_override'); model=fromData(); render(); $('status').textContent='기본값에서 새로 시작했어요. (게임 화면도 배포된 기본값으로 돌아가요)'; };
 </script>
 </body>
 </html>
