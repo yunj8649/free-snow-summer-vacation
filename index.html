@@ -164,25 +164,27 @@ function renderScore(){
   document.getElementById('sbBody').innerHTML=state.teams.map((t,ti)=>
     `<tr class="rank${rankOf[ti]}"><td>${t.name}</td>${GAMES.map((g,gi)=>
        `<td><input type="number" min="0" max="${g.score}" value="${state.scores[ti][gi]||0}" data-t="${ti}" data-g="${gi}">
-          <label class="wincheck"><input type="checkbox" data-t="${ti}" data-g="${gi}" ${(+state.scores[ti][gi]||0)===g.score?'checked':''}>이김</label></td>`
+          <button class="winbtn${(+state.scores[ti][gi]||0)===g.score?' on':''}" data-t="${ti}" data-g="${gi}">이김</button></td>`
        ).join('')}<td><input type="number" class="cheer" min="0" max="${CHEER_SCORE}" value="${+state.cheer[ti]||0}" data-t="${ti}">
-          <label class="wincheck"><input type="checkbox" class="cheer" data-t="${ti}" ${(+state.cheer[ti]||0)===CHEER_SCORE?'checked':''}>만점</label></td><td class="total">${totals[ti]}</td></tr>`
+          <button class="winbtn cheer${(+state.cheer[ti]||0)===CHEER_SCORE?' on':''}" data-t="${ti}">만점</button></td><td class="total">${totals[ti]}</td></tr>`
   ).join('');
   document.querySelectorAll('.sb input[type=number]:not(.cheer)').forEach(inp=>inp.oninput=()=>{
     let v=Math.max(0,+inp.value||0); const cap=GAMES[+inp.dataset.g].score;
     if(v>cap){v=cap; inp.value=cap;}
     state.scores[+inp.dataset.t][+inp.dataset.g]=v; save(state); renderScore();
   });
-  document.querySelectorAll('.sb input[type=checkbox]:not(.cheer)').forEach(cb=>cb.onchange=()=>{
-    state.scores[+cb.dataset.t][+cb.dataset.g] = cb.checked ? GAMES[+cb.dataset.g].score : 0;
+  document.querySelectorAll('.sb .winbtn:not(.cheer)').forEach(b=>b.onclick=()=>{
+    const gi=+b.dataset.g, won=(+state.scores[+b.dataset.t][gi]||0)===GAMES[gi].score;
+    state.scores[+b.dataset.t][gi] = won ? 0 : GAMES[gi].score;
     save(state); renderScore();
   });
   document.querySelectorAll('.sb input.cheer[type=number]').forEach(inp=>inp.oninput=()=>{
     let v=Math.max(0,Math.min(CHEER_SCORE,+inp.value||0)); inp.value=v;
     state.cheer[+inp.dataset.t]=v; save(state); renderScore();
   });
-  document.querySelectorAll('.sb input.cheer[type=checkbox]').forEach(cb=>cb.onchange=()=>{
-    state.cheer[+cb.dataset.t]= cb.checked?CHEER_SCORE:0; save(state); renderScore();
+  document.querySelectorAll('.sb .winbtn.cheer').forEach(b=>b.onclick=()=>{
+    const on=(+state.cheer[+b.dataset.t]||0)===CHEER_SCORE;
+    state.cheer[+b.dataset.t]= on?0:CHEER_SCORE; save(state); renderScore();
   });
   const max=Math.max(...totals);
   const done=GAMES.every((g,gi)=>state.teams.some((_,ti)=>(+state.scores[ti][gi]||0)>0)); // 모든 게임에 점수 반영됨
@@ -190,7 +192,7 @@ function renderScore(){
     (done && max>0) ? `🏆 우승: ${state.teams.map((t,i)=>totals[i]===max?t.name:'').filter(Boolean).join(', ')} (${max}점)` : '';
   if(done && max>0){ if(!renderScore._won){ renderScore._won=true; celebrate(); } }
   else renderScore._won=false;
-  document.getElementById('scoreHint').textContent='점수를 직접 입력하거나 "이김"을 체크하면 그 게임 배점만큼 자동 반영돼요.';
+  document.getElementById('scoreHint').textContent='점수를 직접 입력하거나 "이김" 버튼을 누르면 그 게임 배점만큼 자동 반영돼요.';
 }
 // 우승 축하 컨페티
 function celebrate(){
