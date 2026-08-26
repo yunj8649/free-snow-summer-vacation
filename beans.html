@@ -29,7 +29,7 @@
 <script>
 (function(){
   const el=document.getElementById('beanStage');
-  const TOOLS=['쇠젓가락','장대 젓가락','나무젓가락','집게','이쑤시개','빨대','티스푼','빨래집게'];
+  const TOOLS=['쇠젓가락','플라스틱 젓가락','나무 젓가락','빨대','포크','오뎅꼬치','색연필','빨래집게'];
   const TEAMC=[{pill:'#d6f5f1',text:'#0a7d72'},{pill:'#ffe0e8',text:'#c02b4e'},{pill:'#d9f0fb',text:'#1b6a92'},{pill:'#fff0cc',text:'#a9720a'},{pill:'#e6e0fb',text:'#5b45c0'},{pill:'#e2f6d8',text:'#3f7d1e'}];
   function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
   function loadTeams(){ try{ const s=JSON.parse(localStorage.getItem('fss2026b')); if(s&&Array.isArray(s.teams)&&s.teams.length) return s.teams.map((t,i)=>(t&&t.name&&t.name.trim())||`${i+1}팀`); }catch(e){} return null; }
@@ -145,7 +145,7 @@
   const NS='http://www.w3.org/2000/svg';
   const el=document.getElementById('ladderStage');
   const COLORS=['#ef476f','#0fb5a6','#ff9e00','#2aa9e0','#8338ec','#06a86b','#f15bb5','#3a86ff','#fb5607','#118ab2'];
-  const TOOLS=['쇠젓가락','장대 젓가락','나무젓가락','집게','이쑤시개','빨대','티스푼','빨래집게'];
+  const TOOLS=['쇠젓가락','플라스틱 젓가락','나무 젓가락','빨대','포크','오뎅꼬치','색연필','빨래집게'];
   const colW=64, rowH=34, padX=34, lineTop=60;
   let n=8, rungs=[], res=[], svg=null, revealed={};
   function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
