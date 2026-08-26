@@ -1,8 +1,7 @@
 /* 팀 대항 공용 게임 UI (몸으로 말해요 등 재사용) — 사이트 기본(밝은) 테마 사용. style.css 뒤에 로드 */
-.tg-wrap{ min-height:100vh; max-width:640px; margin:0 auto; padding:14px 14px 24px; display:flex; flex-direction:column; }
-.tg-back{ display:inline-block; align-self:flex-start; margin-bottom:8px; }
-.tg-stage{ flex:1; display:flex; }
-.tg-stage > .tg-card{ margin:auto 0; width:100%; }
+.tg-wrap{ min-height:100vh; max-width:640px; margin:0 auto; padding:14px 14px 24px; display:flex; }
+.tg-center{ margin:auto 0; width:100%; }
+.tg-back{ display:inline-block; margin-bottom:8px; }
 .tg-card{ background:var(--card); border:3px solid var(--line); border-radius:22px; padding:24px 20px;
   box-shadow:0 8px 26px rgba(14,58,82,.12); }
 .tg-title{ text-align:center; font-size:1.8rem; font-weight:800; color:var(--ink); margin:0 0 18px; }
