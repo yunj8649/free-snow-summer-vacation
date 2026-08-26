@@ -43,8 +43,8 @@
         <button class="btn g sm toladder">🪜 사다리타기</button>
       </div>
       <div id="drawres" class="resgrid"></div>
-      <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:20px 0 6px;">
-        ${TOOLS.map(t=>`<span style="background:#eafaff; border:2px solid var(--line); color:var(--ink); font-weight:800; padding:12px 18px; border-radius:20px; font-size:1.15rem;">${t}</span>`).join('')}
+      <div style="display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin:20px 0 6px;">
+        ${TOOLS.map(t=>`<span style="background:#eafaff; border:1.5px solid var(--line); color:var(--mut); font-weight:700; padding:4px 9px; border-radius:13px; font-size:.75rem;">${t}</span>`).join('')}
       </div>`;
     el.querySelector('.totimer').onclick=()=>{ el.hidden=true; document.getElementById('timerStage').hidden=false; };
     el.querySelector('.toladder').onclick=()=>{ el.hidden=true; document.getElementById('ladderStage').hidden=false; };
