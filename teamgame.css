@@ -19,6 +19,7 @@
 .tg-seg.on,.tg-chip.on{ background:linear-gradient(135deg,var(--teal),var(--sky)); color:#fff; border-color:transparent;
   box-shadow:0 6px 16px rgba(15,181,166,.3); }
 .tg-seg:active,.tg-chip:active{ transform:scale(.96); }
+.tg-chip:disabled{ opacity:.38; cursor:not-allowed; text-decoration:line-through; }
 .tg-cta{ display:block; width:100%; margin-top:24px; border:none; cursor:pointer; color:#fff;
   background:linear-gradient(135deg,var(--teal),var(--sky)); border-radius:18px; padding:20px; font-size:1.3rem;
   font-weight:800; box-shadow:0 10px 26px rgba(15,181,166,.3); }
