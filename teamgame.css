@@ -8,6 +8,9 @@
 .tg-label{ color:var(--mut); font-size:1rem; font-weight:700; margin:18px 0 10px; }
 .tg-teams{ display:flex; flex-wrap:wrap; gap:8px; }
 .tg-teamtag{ padding:8px 14px; border-radius:20px; font-size:1rem; font-weight:800; }
+.tg-shuffle{ padding:8px 14px; border-radius:20px; font-size:1rem; font-weight:800; cursor:pointer;
+  background:#fff; color:var(--sky); border:2px solid var(--line); }
+.tg-shuffle:active{ transform:scale(.96); }
 .tg-teamnote{ color:var(--mut); font-size:.9rem; margin-top:8px; }
 .tg-row{ display:flex; flex-wrap:wrap; gap:10px; }
 .tg-seg,.tg-chip{ background:#fff; color:var(--mut); border:2px solid var(--line); cursor:pointer;
