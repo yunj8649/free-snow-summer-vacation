@@ -63,8 +63,13 @@ for(const [cat,list] of Object.entries(INITIALS)){
 // 몸으로 말해요 (제시어)
 html+='<h2>🤸 몸으로 말해요 (제시어)</h2>';
 for(const [cat,list] of Object.entries(CHARADES)){
-  html+=`<h3>${cat}</h3><table class="tbl"><thead><tr><th class="num">#</th><th>제시어</th></tr></thead><tbody>`;
-  list.forEach((w,i)=>{ html+=`<tr><td class="num">${i+1}</td><td class="ans">${esc(w)}</td></tr>`; });
+  html+=`<h3>${cat}</h3><table class="tbl"><thead><tr><th class="num">#</th><th>제시어</th><th class="num">#</th><th>제시어</th></tr></thead><tbody>`;
+  for(let i=0;i<list.length;i+=2){
+    const b=list[i+1];
+    html+=`<tr><td class="num">${i+1}</td><td class="ans">${esc(list[i])}</td>`
+        + (b!==undefined ? `<td class="num">${i+2}</td><td class="ans">${esc(b)}</td>` : '<td></td><td></td>')
+        + '</tr>';
+  }
   html+='</tbody></table>';
 }
 
