@@ -35,7 +35,7 @@
     const PPC=cfg.pointsPerCorrect||1, PASS=cfg.passesPerTurn==null?3:cfg.passesPerTurn;
     const timeOpts=cfg.timeOptions||[60,90,120];
     const st={ names:loadTeams()||['1팀','2팀'], timePer:timeOpts[0], sel:new Set(),
-      scores:[], round:1, team:0,
+      scores:[], round:1, team:0, order:[], pos:0,
       queue:[], qi:0, turnScore:0, turnWords:[], passLeft:0, remain:0, tick:null, revealed:false };
     const nT=()=>st.names.length;
     const tname=i=>st.names[i]||`${i+1}팀`;
@@ -71,7 +71,8 @@
       });
       el.querySelector('#startBtn').onclick=()=>{
         if(st.sel.size===0){ alert('카드 덱을 하나 이상 선택하세요.'); return; }
-        st.names=loadTeams()||st.names; st.scores=Array(nT()).fill(0); st.round=1; st.team=0; ready();
+        st.names=loadTeams()||st.names; st.scores=Array(nT()).fill(0); st.round=1;
+        st.order=shuffle(Array.from({length:nT()},(_,i)=>i)); st.pos=0; st.team=st.order[0]; ready();
       };
     }
 
@@ -88,6 +89,7 @@
         <div class="tg-emoji">${cfg.emoji||'🎮'}</div>
         <div class="tg-heading" style="color:${tc(st.team).text}">${esc(tname(st.team))} 차례!</div>
         <div class="tg-sub">설명할 사람은 폰을 들고, 나머지는 맞힐 준비!</div>
+        <div class="tg-teamnote" style="text-align:center">🔀 순서: ${st.order.map((ti,k)=>`${k===st.pos?'▶ ':''}${esc(tname(ti))}`).join('  →  ')}</div>
         ${scoreChips(st.team)}
         <button class="tg-cta" id="go">시작!</button>
       </div>`;
@@ -136,7 +138,7 @@
     // ---------- 턴 결과 ----------
     function turnResult(){
       stopTick();
-      const lastTeam = st.team===nT()-1;
+      const lastTeam = st.pos===nT()-1;
       const chips = st.turnWords.length
         ? `<div class="tg-wordchips">${st.turnWords.map(w=>`<span class="tg-wchip">✓ ${esc(w)}</span>`).join('')}</div>`
         : `<div class="tg-none">맞힌 단어가 없어요 😅</div>`;
@@ -152,11 +154,11 @@
       </div>`;
       const brow=el.querySelector('#brow');
       if(!lastTeam){
-        brow.innerHTML=`<button class="tg-cta" style="margin:0" id="next">다음 팀: ${esc(tname(st.team+1))}</button>`;
-        el.querySelector('#next').onclick=()=>{ st.team++; ready(); };
+        brow.innerHTML=`<button class="tg-cta" style="margin:0" id="next">다음 팀: ${esc(tname(st.order[st.pos+1]))}</button>`;
+        el.querySelector('#next').onclick=()=>{ st.pos++; st.team=st.order[st.pos]; ready(); };
       } else {
         brow.innerHTML=`<button class="tg-cta" style="margin:0" id="more">한 바퀴 더</button><button class="tg-secondary" id="fin">최종 결과 보기</button>`;
-        el.querySelector('#more').onclick=()=>{ st.round++; st.team=0; ready(); };
+        el.querySelector('#more').onclick=()=>{ st.round++; st.order=shuffle(Array.from({length:nT()},(_,i)=>i)); st.pos=0; st.team=st.order[0]; ready(); };
         el.querySelector('#fin').onclick=()=>final();
       }
       el.querySelector('#end').onclick=()=>final();
