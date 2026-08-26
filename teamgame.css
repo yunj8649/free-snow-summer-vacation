@@ -1,0 +1,82 @@
+/* 팀 대항 공용 게임 UI (몸으로 말해요 등에서 재사용) — 다크 테마 */
+:root{
+  --tg-bg:#0a0a12; --tg-card:#1a1a28; --tg-border:#2a2a3a; --tg-panel:#20202e; --tg-chip:#262636;
+  --tg-word:#241d52; --tg-fg:#fff; --tg-mut:#9ca3af; --tg-chipfg:#c7c7d1;
+  --tg-grad:linear-gradient(135deg,#6d5efc,#8b5cf6); --tg-glow:0 12px 34px rgba(109,94,252,.35);
+  --tg-green:#34d399; --tg-greenbg:#173028; --tg-greenfg:#6ee7b7;
+}
+.tg-body{ margin:0; background:var(--tg-bg); color:var(--tg-fg);
+  font-family:"Pretendard",system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;
+  min-height:100vh; }
+.tg-wrap{ max-width:640px; margin:0 auto; padding:16px 14px 60px; }
+.tg-back{ display:inline-block; color:var(--tg-mut); text-decoration:none; font-size:.9rem; margin-bottom:10px; }
+.tg-card{ background:var(--tg-card); border:1px solid var(--tg-border); border-radius:24px; padding:28px 24px;
+  box-shadow:0 20px 50px rgba(0,0,0,.4); }
+.tg-title{ text-align:center; font-size:1.9rem; font-weight:800; margin:0 0 20px; }
+.tg-label{ color:var(--tg-mut); font-size:1rem; font-weight:600; margin:20px 0 10px; }
+.tg-row{ display:flex; flex-wrap:wrap; gap:10px; }
+.tg-seg,.tg-chip{ background:var(--tg-chip); color:var(--tg-chipfg); border:none; cursor:pointer;
+  padding:13px 22px; border-radius:13px; font-size:1.05rem; font-weight:700; transition:transform .05s; }
+.tg-chip{ padding:11px 18px; border-radius:12px; font-size:1rem; }
+.tg-seg.on,.tg-chip.on{ background:var(--tg-grad); color:#fff; box-shadow:var(--tg-glow); }
+.tg-seg:active,.tg-chip:active{ transform:scale(.96); }
+.tg-cta{ display:block; width:100%; margin-top:26px; border:none; cursor:pointer; color:#fff;
+  background:var(--tg-grad); border-radius:18px; padding:22px; font-size:1.35rem; font-weight:800;
+  box-shadow:var(--tg-glow); }
+.tg-cta:active{ transform:scale(.99); }
+.tg-foot{ text-align:center; color:var(--tg-mut); font-size:.92rem; margin-top:18px; line-height:1.5; }
+/* 준비 화면 */
+.tg-ready{ text-align:center; }
+.tg-badge{ display:inline-block; background:#2e2a5c; color:#b9a9ff; font-size:.85rem; font-weight:700;
+  padding:6px 14px; border-radius:20px; }
+.tg-emoji{ font-size:4.4rem; margin:14px 0 6px; }
+.tg-heading{ font-size:2.4rem; font-weight:800; margin:4px 0 8px; }
+.tg-sub{ color:var(--tg-mut); font-size:1.05rem; margin:0 0 20px; }
+.tg-scorechips{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:8px; }
+.tg-scorechip{ padding:9px 16px; border-radius:20px; font-size:1rem; font-weight:800; border:2px solid transparent; }
+.tg-scorechip.active{ box-shadow:0 0 0 2px rgba(255,255,255,.15); }
+/* 플레이 화면 */
+.tg-hdr{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:12px; }
+.tg-hbadge{ padding:6px 14px; border-radius:16px; font-size:.9rem; font-weight:800; }
+.tg-turn{ text-align:center; color:var(--tg-mut); font-size:.85rem; }
+.tg-turn b{ display:block; color:var(--tg-green); font-size:1.6rem; font-weight:800; }
+.tg-timer{ font-size:2.4rem; font-weight:800; min-width:64px; text-align:right; font-variant-numeric:tabular-nums; }
+.tg-timer.low{ color:#f43f5e; }
+.tg-bar{ height:12px; background:#26263a; border-radius:99px; overflow:hidden; margin-bottom:18px; }
+.tg-barfill{ height:100%; background:var(--tg-grad); border-radius:99px; transition:width 1s linear; }
+.tg-wordcard{ background:var(--tg-word); border-radius:20px; min-height:300px; display:flex; align-items:center;
+  justify-content:center; text-align:center; padding:24px; }
+.tg-word{ font-size:3.4rem; font-weight:800; line-height:1.2; word-break:keep-all; }
+.tg-word small{ display:block; font-size:1.5rem; color:#b9a9ff; margin-top:10px; font-weight:700; }
+.tg-revbtn{ margin-top:18px; background:#3a3a58; color:#dcdcf0; border:none; border-radius:12px; padding:10px 18px; font-size:1rem; font-weight:700; cursor:pointer; }
+.tg-actions{ display:flex; gap:16px; margin-top:16px; }
+.tg-correct,.tg-pass{ flex:1; border:none; cursor:pointer; color:#fff; border-radius:18px; min-height:120px;
+  font-size:1.9rem; font-weight:800; }
+.tg-correct{ background:linear-gradient(135deg,#4ade80,#3ab98a); box-shadow:0 12px 30px rgba(67,201,154,.3); }
+.tg-pass{ background:linear-gradient(135deg,#f472b6,#f43f5e); box-shadow:0 12px 30px rgba(238,90,122,.3); }
+.tg-correct:active,.tg-pass:active{ transform:scale(.97); }
+.tg-pass:disabled{ background:#4a2530; color:#8a6a72; box-shadow:none; cursor:not-allowed; }
+.tg-passfoot{ text-align:center; color:var(--tg-mut); font-size:.95rem; margin-top:14px; }
+/* 결과 화면 */
+.tg-result{ text-align:center; }
+.tg-rhead{ font-size:1.7rem; font-weight:800; margin:4px 0 10px; }
+.tg-rpoints{ font-size:2.6rem; font-weight:800; color:var(--tg-green); margin:6px 0 18px; }
+.tg-wordchips{ display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-start; }
+.tg-wchip{ background:var(--tg-greenbg); color:var(--tg-greenfg); padding:8px 13px; border-radius:12px;
+  font-size:.95rem; font-weight:700; }
+.tg-none{ color:var(--tg-mut); font-size:.95rem; }
+.tg-scoreboard{ display:flex; flex-direction:column; gap:8px; }
+.tg-scorerow{ display:flex; align-items:center; justify-content:space-between; background:var(--tg-panel);
+  border-radius:12px; padding:14px 18px; font-size:1.1rem; font-weight:800; }
+.tg-scorerow .nm{ display:flex; align-items:center; gap:8px; }
+.tg-medal{ font-size:1.3rem; }
+.tg-btnrow{ display:flex; gap:12px; margin-top:24px; }
+.tg-btnrow>*{ flex:1; }
+.tg-secondary{ background:#3a3a48; color:#dcdcf0; border:none; cursor:pointer; border-radius:16px; padding:20px;
+  font-size:1.1rem; font-weight:800; }
+.tg-link{ display:block; text-align:center; color:var(--tg-mut); text-decoration:underline; margin-top:16px;
+  background:none; border:none; cursor:pointer; width:100%; font-size:.95rem; }
+@media(max-width:480px){
+  .tg-word{ font-size:2.6rem; } .tg-heading{ font-size:2rem; } .tg-emoji{ font-size:3.6rem; }
+  .tg-correct,.tg-pass{ font-size:1.5rem; min-height:100px; }
+}
