@@ -117,3 +117,13 @@ const INITIALS = {
   '🦸 애니': [['ㅍㅋㅁㅅㅌ','포켓몬스터'],['ㅉㄱㄴ ㅁㅁㄹ','짱구는 못말려'],['ㄷㄹㅇㅁ','도라에몽'],['ㅇㅍㅅ','원피스'],['ㄱㅁㅇ ㅋㄴ','귀멸의 칼날'],['ㅅㄹㄷㅋ','슬램덩크'],['ㅁㅌㅈ ㅋㄴ','명탐정 코난'],['ㅅㅇㄹㅁ','세일러문'],['ㅇㅇㅈ ㅌㅌㄹ','이웃집 토토로'],['ㅈㅅㅎㅈ','주술회전']],
   '🎮 게임': [['ㅁㅇㅋㄹㅍㅌ','마인크래프트'],['ㄹㄱ ㅇㅂ ㄹㅈㄷ','리그 오브 레전드'],['ㅂㅌㄱㄹㅇㄷ','배틀그라운드'],['ㅇㅂㅇㅊ','오버워치'],['ㅋㅌㄹㅇㄷ','카트라이더'],['ㅅㅌㅋㄹㅍㅌ','스타크래프트'],['ㅇㅁㅇㅅ','어몽어스'],['ㄹㅂㄹㅅ','로블록스'],['ㅁㅇㅍㅅㅌㄹ','메이플스토리'],['ㄷㅁㅇ ㅅ','동물의 숲']],
 };
+
+// 문제 편집(edit.html)에서 저장한 로컬 수정본 적용 — 이 기기의 브라우저에서만 유효, 코드에는 반영 안 됨
+try{
+  const _ov=JSON.parse(localStorage.getItem('fss_override')||'null');
+  if(_ov){
+    if(_ov.CHARADES){ for(const k in CHARADES) delete CHARADES[k]; Object.assign(CHARADES,_ov.CHARADES); }
+    if(_ov.INITIALS){ for(const k in INITIALS) delete INITIALS[k]; Object.assign(INITIALS,_ov.INITIALS); }
+    if(Array.isArray(_ov.OX)){ OX.length=0; _ov.OX.forEach(o=>OX.push(o)); }
+  }
+}catch(e){}
