@@ -106,9 +106,9 @@
       <div class="ctrl"><button class="btn g sm toladd">← 도구 목록</button>
         1인당 <input type="number" class="tsec" min="1" max="600" value="${secs}"> 초
         &nbsp;·&nbsp; 인원 <input type="number" class="tppl" min="1" max="30" value="${people}"> 명</div>
-      <div style="text-align:center; margin:14px 0;">
-        <div style="font-size:1.6rem; font-weight:800; color:var(--teal)">${cur+1}번 차례</div>
-        <div style="font-size:4rem; font-weight:900; color:${remain<=5?'#ef476f':'var(--ink)'}; line-height:1.1">${mmss(remain)}</div>
+      <div style="text-align:center; margin:30px 0; padding:10px 0;">
+        <div style="font-size:1.6rem; font-weight:800; color:var(--teal); margin-bottom:18px;">${cur+1}번 차례</div>
+        <div style="font-size:4rem; font-weight:900; color:${remain<=5?'#ef476f':'var(--ink)'}; line-height:1.1; margin-top:6px;">${mmss(remain)}</div>
       </div>
       <div class="nav2">
         <button class="btn p" id="tgo">${running?'⏸ 일시정지':'▶ 시작'}</button>
