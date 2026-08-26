@@ -168,20 +168,38 @@
     }
 
     // ---------- 최종 결과 ----------
+    function recordWin(winIdx, btn){
+      try{
+        const s=JSON.parse(localStorage.getItem('fss2026b'))||{};
+        const gi=(typeof GAMES!=='undefined')?GAMES.findIndex(g=>g.tab===cfg.gameTab):-1;
+        if(gi<0){ alert('점수판에서 이 게임을 찾을 수 없어요.'); return; }
+        const nteams=(s.teams||[]).length;
+        if(!Array.isArray(s.scores)) s.scores=[];
+        for(let i=0;i<nteams;i++){ if(!Array.isArray(s.scores[i])) s.scores[i]=[]; s.scores[i][gi] = (i===winIdx ? (GAMES[gi].score||0) : 0); }
+        localStorage.setItem('fss2026b', JSON.stringify(s));
+        btn.textContent='✅ 점수판에 반영됐어요'; btn.disabled=true; btn.style.opacity=.7;
+      }catch(e){ alert('반영 실패: '+e); }
+    }
     function final(){
       stopTick();
       const order=st.scores.map((s,i)=>({i,s})).sort((a,b)=>b.s-a.s);
       const medals=['🥇','🥈','🥉'];
       const top=order[0].s, soleWinner=top>0 && order.filter(o=>o.s===top).length===1;
+      const canRecord = soleWinner && cfg.gameTab && !!loadTeams();
       el.innerHTML=`<div class="tg-card tg-result">
         <div class="tg-emoji">🏆</div>
         <div class="tg-heading">${soleWinner?`${esc(tname(order[0].i))} 우승!`:'게임 종료'}</div>
         <div class="tg-scoreboard" style="margin-top:16px">
           ${order.map((o,r)=>`<div class="tg-scorerow"><span class="nm"><span class="tg-medal">${medals[r]||'　'}</span><span style="color:${tc(o.i).text}">${esc(tname(o.i))}</span></span><span>${o.s}점</span></div>`).join('')}
         </div>
-        <button class="tg-cta" id="again">처음으로</button>
+        ${canRecord?`<button class="tg-cta" id="rec">🏆 ${esc(tname(order[0].i))} 우승 · 점수판에 반영</button>`:''}
+        <div class="tg-btnrow">
+          <button class="tg-secondary" id="again">처음으로</button>
+          <a class="tg-secondary" href="./index.html" style="text-decoration:none; display:flex; align-items:center; justify-content:center">🏠 점수판</a>
+        </div>
       </div>`;
       el.querySelector('#again').onclick=()=>setup();
+      if(canRecord) el.querySelector('#rec').onclick=e=>recordWin(order[0].i, e.currentTarget);
     }
 
     setup();
