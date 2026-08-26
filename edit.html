@@ -11,53 +11,65 @@
   header { text-align:center; padding:18px 12px 6px; }
   h1 { margin:0; font-size:1.4rem; }
   .warn { color:var(--hot); font-size:.85rem; margin-top:6px; }
-  main { max-width:820px; margin:0 auto; padding:8px 14px 90px; }
+  main { max-width:860px; margin:0 auto; padding:8px 14px 96px; }
   h2 { font-size:1.15rem; margin:26px 0 10px; padding-bottom:6px; border-bottom:2px solid var(--accent); }
   .topic { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; margin:10px 0; }
-  .topic-head { display:flex; gap:8px; align-items:center; margin-bottom:8px; }
-  .topic-head input { flex:1; font-size:1rem; font-weight:700; padding:7px 10px; border-radius:8px; border:1px solid var(--line); background:#11152a; color:var(--fg); }
-  textarea { width:100%; min-height:120px; padding:9px 11px; border-radius:8px; border:1px solid var(--line); background:#11152a; color:var(--fg); font-size:.95rem; line-height:1.5; resize:vertical; font-family:inherit; }
-  .hintline { color:var(--mut); font-size:.82rem; margin:4px 0 0; }
+  .topic.hidden { opacity:.4; }
+  .topic-head { display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
+  .topic-head input.tname { flex:1; min-width:140px; font-size:1rem; font-weight:800; padding:7px 10px; border-radius:8px; border:1px solid var(--line); background:#11152a; color:var(--fg); }
+  .count { color:var(--mut); font-size:.82rem; white-space:nowrap; }
+  .toggle { border:1px solid var(--line); background:#11152a; color:var(--mut); padding:6px 11px; border-radius:20px; font-size:.82rem; cursor:pointer; font-weight:700; }
+  .toggle.on { background:var(--ok); color:#06301b; border-color:var(--ok); }
+  .rows { display:flex; flex-direction:column; gap:5px; }
+  .row { display:flex; gap:7px; align-items:center; }
+  .row input[type=checkbox]{ width:20px; height:20px; flex:none; accent-color:var(--ok); }
+  .row.off { opacity:.4; }
+  .row .itext { flex:1; padding:6px 9px; border-radius:7px; border:1px solid var(--line); background:#11152a; color:var(--fg); font-size:.95rem; }
+  .row .ox { flex:none; padding:6px; border-radius:7px; border:1px solid var(--line); background:#11152a; color:var(--fg); }
+  .row .ie { flex:1; }
+  .row .rdel { flex:none; background:transparent; color:var(--hot); border:none; font-size:1.2rem; cursor:pointer; padding:0 6px; }
+  .row .cho { flex:none; color:var(--accent); font-size:.85rem; min-width:70px; text-align:right; }
   button { font-size:.9rem; padding:8px 13px; border-radius:8px; border:none; cursor:pointer; font-weight:700; }
-  .del { background:transparent; color:var(--hot); border:1px solid var(--hot); padding:6px 10px; }
-  .add { background:var(--blue); color:#fff; margin-top:6px; }
+  .add { background:var(--blue); color:#fff; margin-top:8px; }
+  .addtopic { background:var(--blue); color:#fff; }
   .bar { position:fixed; left:0; right:0; bottom:0; background:#0b0e1a; border-top:1px solid var(--line); padding:12px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; z-index:10; }
-  .apply { background:var(--ok); color:#06301b; }
   .export { background:var(--accent); color:#3a2c00; }
+  .apply { background:var(--ok); color:#06301b; }
   .reset { background:transparent; color:var(--mut); border:1px solid var(--line); }
   a.home { color:var(--mut); }
   #out { display:none; margin-top:16px; }
-  #out textarea { min-height:220px; font-family:ui-monospace,monospace; font-size:.8rem; }
+  #out textarea { width:100%; min-height:240px; font-family:ui-monospace,monospace; font-size:.8rem; padding:10px; border-radius:8px; border:1px solid var(--line); background:#11152a; color:var(--fg); }
   .status { text-align:center; color:var(--ok); min-height:20px; font-size:.9rem; margin-top:8px; }
+  .hintline { color:var(--mut); font-size:.82rem; }
 </style>
 </head>
 <body>
 <header>
   <h1>✏️ 문제 편집 (진행자용)</h1>
-  <div class="warn">⚠️ 여기서 수정하면 <b>이 기기(브라우저)</b>에만 저장돼요. 모든 사람/모든 기기에 영구 반영하려면 "코드용 내보내기"로 뽑아서 개발자에게 전달하세요.</div>
-  <div style="margin-top:6px"><a class="home" href="./index.html">← 게임 화면으로</a></div>
+  <div class="warn">체크 해제 = 사용 안 함 · 주제 <b>숨김</b> = 통째로 제외. 완료되면 하단 <b>📋 코드용 내보내기</b>로 뽑아 개발자에게 전달하세요.</div>
+  <div style="margin-top:6px"><a class="home" href="./index.html">← 게임 화면으로</a> · <span class="hintline">수정 내용은 자동 임시저장돼요</span></div>
 </header>
 <main>
-  <h2>🤸 몸으로 말해요 (제시어)</h2>
+  <h2>🤸 몸으로 말해요</h2>
   <div id="charBox"></div>
-  <button class="add" id="charAdd">+ 주제 추가</button>
+  <button class="addtopic" id="charAdd">+ 주제 추가</button>
 
-  <h2>💡 초성 맞추기 <span class="hintline">— 정답만 입력하면 초성은 자동 생성돼요</span></h2>
+  <h2>💡 초성 맞추기 <span class="hintline">— 정답만 입력하면 초성 자동</span></h2>
   <div id="iniBox"></div>
-  <button class="add" id="iniAdd">+ 주제 추가</button>
+  <button class="addtopic" id="iniAdd">+ 주제 추가</button>
 
   <h2>⭕❌ OX 퀴즈</h2>
-  <p class="hintline">한 줄에 하나씩 · 형식: <b>문제 | O</b> 또는 <b>문제 | X | 해설(선택)</b></p>
-  <textarea id="oxArea" style="min-height:260px"></textarea>
+  <div id="oxBox"></div>
+  <button class="add" id="oxAdd">+ 문제 추가</button>
 
-  <div id="out"><h2>📋 코드용 내보내기</h2><p class="hintline">아래 내용을 전부 복사해서 개발자에게 전달하세요.</p><textarea id="outArea" readonly></textarea></div>
+  <div id="out"><h2>📋 코드용 내보내기</h2><p class="hintline">아래 내용 전체를 복사해 개발자에게 전달하세요. (사용 안 함/숨김은 제외됨)</p><textarea id="outArea" readonly></textarea></div>
   <div class="status" id="status"></div>
 </main>
 
 <div class="bar">
-  <button class="apply" id="btnApply">💾 이 기기에 적용</button>
   <button class="export" id="btnExport">📋 코드용 내보내기</button>
-  <button class="reset" id="btnReset">↺ 기본값으로 복원</button>
+  <button class="apply" id="btnApply">💾 이 기기에 적용</button>
+  <button class="reset" id="btnReset">↺ 기본값에서 새로 시작</button>
 </div>
 
 <script src="data.js"></script>
@@ -65,68 +77,101 @@
 const LEAD='ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ';
 function chosung(s){ let o=''; for(const ch of s){ if(ch===' '){o+=' ';continue;} const c=ch.charCodeAt(0); if(c>=0xAC00&&c<=0xD7A3) o+=LEAD[Math.floor((c-0xAC00)/588)]; } return o.replace(/ +/g,' ').trim(); }
 const $=id=>document.getElementById(id);
+const DRAFT='fss_editdraft';
 
-// 모델 초기화 (data.js의 현재값 = override 적용된 값)
-let charModel=Object.entries(CHARADES).map(([name,items])=>({name, items:items.slice()}));
-let iniModel=Object.entries(INITIALS).map(([name,list])=>({name, answers:list.map(p=>p[1])}));
+// 모델: 기본값(data.js)에서 생성, 임시저장 있으면 복원
+let model;
+function fromData(){
+  return {
+    char: Object.entries(CHARADES).map(([name,items])=>({name, show:true, items:items.map(t=>({t, use:true}))})),
+    ini:  Object.entries(INITIALS).map(([name,list])=>({name, show:true, items:list.map(p=>({t:p[1], use:true}))})),
+    ox:   OX.map(o=>({q:o.q, a:!!o.a, e:o.e||'', use:true}))
+  };
+}
+try{ const d=JSON.parse(localStorage.getItem(DRAFT)||'null'); model = (d&&d.char&&d.ini&&d.ox)? d : fromData(); }catch(e){ model=fromData(); }
 
-function topicEl(t, kind){
-  const div=document.createElement('div'); div.className='topic';
-  const placeholder = kind==='ini' ? '정답 (한 줄에 하나)' : '제시어 (한 줄에 하나)';
-  const body = kind==='ini' ? t.answers.join('\n') : t.items.join('\n');
-  div.innerHTML=`<div class="topic-head"><input class="tname" value="${t.name.replace(/"/g,'&quot;')}"><button class="del">삭제</button></div>
-    <textarea class="tbody" placeholder="${placeholder}">${body}</textarea>`;
-  div.querySelector('.del').onclick=()=>{ scrape(); (kind==='ini'?iniModel:charModel).splice(indexOf(div,kind),1); render(kind); };
+function saveDraft(){ localStorage.setItem(DRAFT, JSON.stringify(model)); }
+
+// ---- 렌더 ----
+function itemRow(it, kind){
+  const r=document.createElement('div'); r.className='row'+(it.use?'':' off');
+  const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=it.use;
+  const tx=document.createElement('input'); tx.className='itext'; tx.value=it.t;
+  cb.onchange=()=>{ it.use=cb.checked; r.classList.toggle('off',!it.use); saveDraft(); updateCounts(); };
+  tx.oninput=()=>{ it.t=tx.value; if(kind==='ini'&&cho) cho.textContent=chosung(tx.value); saveDraft(); };
+  r.appendChild(cb); r.appendChild(tx);
+  let cho=null;
+  if(kind==='ini'){ cho=document.createElement('span'); cho.className='cho'; cho.textContent=chosung(it.t); r.appendChild(cho); }
+  const del=document.createElement('button'); del.className='rdel'; del.textContent='×';
+  del.onclick=()=>{ const arr=findArr(it,kind); arr.splice(arr.indexOf(it),1); saveDraft(); render(); };
+  r.appendChild(del);
+  return r;
+}
+function findArr(it, kind){
+  const list = kind==='char'?model.char:model.ini;
+  for(const tp of list){ if(tp.items.includes(it)) return tp.items; }
+  return [];
+}
+function oxRow(o){
+  const r=document.createElement('div'); r.className='row'+(o.use?'':' off');
+  const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=o.use;
+  cb.onchange=()=>{ o.use=cb.checked; r.classList.toggle('off',!o.use); saveDraft(); $('oxcount').textContent=oxCountStr(); };
+  const q=document.createElement('input'); q.className='itext'; q.value=o.q; q.placeholder='문제'; q.oninput=()=>{o.q=q.value; saveDraft();};
+  const sel=document.createElement('select'); sel.className='ox'; sel.innerHTML='<option value="O">O</option><option value="X">X</option>'; sel.value=o.a?'O':'X'; sel.onchange=()=>{o.a=(sel.value==='O'); saveDraft();};
+  const e=document.createElement('input'); e.className='itext ie'; e.value=o.e; e.placeholder='해설(선택)'; e.oninput=()=>{o.e=e.value; saveDraft();};
+  const del=document.createElement('button'); del.className='rdel'; del.textContent='×'; del.onclick=()=>{ model.ox.splice(model.ox.indexOf(o),1); saveDraft(); render(); };
+  [cb,q,sel,e,del].forEach(x=>r.appendChild(x));
+  return r;
+}
+function topicEl(tp, kind){
+  const div=document.createElement('div'); div.className='topic'+(tp.show?'':' hidden');
+  const head=document.createElement('div'); head.className='topic-head';
+  const name=document.createElement('input'); name.className='tname'; name.value=tp.name; name.oninput=()=>{tp.name=name.value; saveDraft();};
+  const cnt=document.createElement('span'); cnt.className='count';
+  const tog=document.createElement('button'); tog.className='toggle'+(tp.show?' on':''); tog.textContent=tp.show?'표기':'숨김';
+  tog.onclick=()=>{ tp.show=!tp.show; saveDraft(); render(); };
+  head.appendChild(name); head.appendChild(cnt); head.appendChild(tog);
+  div.appendChild(head);
+  const rows=document.createElement('div'); rows.className='rows';
+  tp.items.forEach(it=>rows.appendChild(itemRow(it,kind)));
+  div.appendChild(rows);
+  const add=document.createElement('button'); add.className='add'; add.textContent='+ 항목 추가';
+  add.onclick=()=>{ tp.items.push({t:'', use:true}); saveDraft(); render(); };
+  div.appendChild(add);
+  const upd=()=>{ cnt.textContent='사용 '+tp.items.filter(i=>i.use).length+' / 전체 '+tp.items.length; };
+  upd(); div._upd=upd;
   return div;
 }
-function indexOf(div, kind){ const box=kind==='ini'?$('iniBox'):$('charBox'); return [...box.children].indexOf(div); }
-function render(kind){
-  const box = kind==='ini'?$('iniBox'):$('charBox');
-  const model = kind==='ini'?iniModel:charModel;
-  box.innerHTML=''; model.forEach(t=>box.appendChild(topicEl(t,kind)));
+function updateCounts(){ [...$('charBox').children, ...$('iniBox').children].forEach(d=>d._upd&&d._upd()); }
+function oxCountStr(){ return '사용 '+model.ox.filter(o=>o.use).length+' / 전체 '+model.ox.length; }
+function render(){
+  $('charBox').innerHTML=''; model.char.forEach(tp=>$('charBox').appendChild(topicEl(tp,'char')));
+  $('iniBox').innerHTML='';  model.ini.forEach(tp=>$('iniBox').appendChild(topicEl(tp,'ini')));
+  const ob=$('oxBox'); ob.innerHTML='';
+  const head=document.createElement('div'); head.className='topic-head'; head.innerHTML='<span class="count" id="oxcount">'+oxCountStr()+'</span>'; ob.appendChild(head);
+  const rows=document.createElement('div'); rows.className='rows'; model.ox.forEach(o=>rows.appendChild(oxRow(o))); ob.appendChild(rows);
 }
-function scrape(){
-  charModel=[...$('charBox').children].map(d=>({ name:d.querySelector('.tname').value.trim(),
-    items:d.querySelector('.tbody').value.split('\n').map(s=>s.trim()).filter(Boolean) }));
-  iniModel=[...$('iniBox').children].map(d=>({ name:d.querySelector('.tname').value.trim(),
-    answers:d.querySelector('.tbody').value.split('\n').map(s=>s.trim()).filter(Boolean) }));
-}
+render();
+
+$('charAdd').onclick=()=>{ model.char.push({name:'🆕 새 주제', show:true, items:[{t:'',use:true}]}); saveDraft(); render(); };
+$('iniAdd').onclick =()=>{ model.ini.push({name:'🆕 새 주제', show:true, items:[{t:'',use:true}]}); saveDraft(); render(); };
+$('oxAdd').onclick  =()=>{ model.ox.push({q:'',a:true,e:'',use:true}); saveDraft(); render(); };
+
 function buildData(){
-  scrape();
-  const CH={}; charModel.forEach(t=>{ if(t.name) CH[t.name]=t.items; });
-  const IN={}; iniModel.forEach(t=>{ if(t.name) IN[t.name]=t.answers.map(a=>[chosung(a),a]); });
-  const OXm=$('oxArea').value.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{
-    const p=l.split('|').map(s=>s.trim());
-    const o={ q:p[0], a:/^o$/i.test(p[1]||'') };
-    if(p[2]) o.e=p[2];
-    return o;
-  });
+  const CH={}; model.char.forEach(tp=>{ if(tp.show&&tp.name){ const arr=tp.items.filter(i=>i.use&&i.t.trim()).map(i=>i.t.trim()); if(arr.length) CH[tp.name]=arr; } });
+  const IN={}; model.ini.forEach(tp=>{ if(tp.show&&tp.name){ const arr=tp.items.filter(i=>i.use&&i.t.trim()).map(i=>[chosung(i.t.trim()), i.t.trim()]); if(arr.length) IN[tp.name]=arr; } });
+  const OXm=model.ox.filter(o=>o.use&&o.q.trim()).map(o=>{ const r={q:o.q.trim(), a:!!o.a}; if(o.e&&o.e.trim()) r.e=o.e.trim(); return r; });
   return {CHARADES:CH, INITIALS:IN, OX:OXm};
 }
-
-render('char'); render('ini');
-$('oxArea').value = OX.map(o=> o.q+' | '+(o.a?'O':'X') + (o.e?(' | '+o.e):'')).join('\n');
-$('charAdd').onclick=()=>{ scrape(); charModel.push({name:'🆕 새 주제', items:[]}); render('char'); };
-$('iniAdd').onclick =()=>{ scrape(); iniModel.push({name:'🆕 새 주제', answers:[]}); render('ini'); };
-
-$('btnApply').onclick=()=>{
-  const d=buildData();
-  localStorage.setItem('fss_override', JSON.stringify(d));
-  $('status').textContent='✅ 이 기기에 저장했어요. 게임 화면에서 바로 반영돼요.';
-};
 $('btnExport').onclick=()=>{
-  const d=buildData();
-  $('outArea').value=JSON.stringify(d, null, 2);
-  $('out').style.display='block';
-  $('outArea').select();
+  $('outArea').value=JSON.stringify(buildData(), null, 2);
+  $('out').style.display='block'; $('outArea').select();
   try{ document.execCommand('copy'); $('status').textContent='📋 복사했어요. 개발자에게 전달하세요.'; }
-  catch(e){ $('status').textContent='아래 내용을 전부 복사해서 개발자에게 전달하세요.'; }
+  catch(e){ $('status').textContent='아래 내용을 전부 복사해서 전달하세요.'; }
   $('out').scrollIntoView({behavior:'smooth'});
 };
-$('btnReset').onclick=()=>{
-  if(!confirm('이 기기의 수정본을 지우고 기본값으로 되돌릴까요?')) return;
-  localStorage.removeItem('fss_override'); location.reload();
-};
+$('btnApply').onclick=()=>{ localStorage.setItem('fss_override', JSON.stringify(buildData())); $('status').textContent='✅ 이 기기에 적용했어요. 게임 화면에 바로 반영돼요.'; };
+$('btnReset').onclick=()=>{ if(!confirm('임시저장을 지우고 기본값(data.js)에서 새로 시작할까요?')) return; localStorage.removeItem(DRAFT); model=fromData(); render(); $('status').textContent='기본값에서 새로 시작했어요.'; };
 </script>
 </body>
 </html>
