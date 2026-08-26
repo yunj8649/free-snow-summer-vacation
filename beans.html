@@ -18,101 +18,43 @@
 <script src="bgmbar.js"></script>
 <script>
 (function(){
-  const NS='http://www.w3.org/2000/svg';
   const el=document.getElementById('beanStage');
-  const COLORS=['#ef476f','#0fb5a6','#ff9e00','#2aa9e0','#8338ec','#06a86b','#f15bb5','#3a86ff','#fb5607','#118ab2'];
   const TOOLS=['쇠젓가락','장대 젓가락','나무젓가락','집게','이쑤시개','빨대','티스푼','빨래집게'];
-  const colW=64, rowH=34, padX=34, lineTop=60;
-  let n=8, rungs=[], res=[], svg=null, revealed={};
+  const TEAMC=[{pill:'#d6f5f1',text:'#0a7d72'},{pill:'#ffe0e8',text:'#c02b4e'},{pill:'#d9f0fb',text:'#1b6a92'},{pill:'#fff0cc',text:'#a9720a'},{pill:'#e6e0fb',text:'#5b45c0'},{pill:'#e2f6d8',text:'#3f7d1e'}];
   function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
-  function xOf(c){ return padX + c*colW; }
-  function rowY(r){ return lineTop+26 + r*rowH; }
-  function bottomY(){ return rowY(rungs.length-1)+26; }
-  function gen(){
-    const rows=Math.max(n+2,6);
-    rungs=[];
-    for(let r=0;r<rows;r++){
-      const row=[];
-      for(let i=0;i<n-1;i++){ row[i]=(!row[i-1] && Math.random()<0.45); }
-      rungs.push(row);
-    }
-    res=shuffle(TOOLS).slice(0,n);
-    revealed={};
-  }
-  function trace(c){
-    const pts=[[xOf(c),lineTop]];
-    for(let r=0;r<rungs.length;r++){
-      const y=rowY(r); pts.push([xOf(c),y]);
-      if(c>0 && rungs[r][c-1]){ c--; pts.push([xOf(c),y]); }
-      else if(c<n-1 && rungs[r][c]){ c++; pts.push([xOf(c),y]); }
-    }
-    pts.push([xOf(c),bottomY()]);
-    return {pts, end:c};
-  }
-  function draw(){
-    const W=padX*2 + (n-1)*colW, H=bottomY()+38;
+  function loadTeams(){ try{ const s=JSON.parse(localStorage.getItem('fss2026b')); if(s&&Array.isArray(s.teams)&&s.teams.length) return s.teams.map((t,i)=>(t&&t.name&&t.name.trim())||`${i+1}팀`); }catch(e){} return null; }
+  function render(){
     el.innerHTML=`
       <div class="badge">콩 옮기기</div>
-      <div class="ctrl">인원 수 <input type="number" class="cnt" min="1" max="${TOOLS.length}" value="${n}"> 명
-        <button class="btn p sm gen">새 사다리</button>
-        <button class="btn g sm all">전체 공개</button>
-        <button class="btn g sm totimer">순서 타이머 ▶</button></div>
-      <div class="laddwrap" style="overflow-x:auto; padding:8px 0;">
-        <svg id="ladd" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="max-width:100%; height:auto;"></svg>
+      <p class="hint">각 팀에 아래 도구들을 나눠주세요. 팀 안에서 누가 어떤 도구를 쓸지는 자유롭게 정하면 돼요!</p>
+      <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:16px 0;">
+        ${TOOLS.map(t=>`<span style="background:#eafaff; border:2px solid var(--line); color:var(--ink); font-weight:800; padding:10px 16px; border-radius:20px; font-size:1.05rem;">${t}</span>`).join('')}
       </div>
-      <div id="laddres" class="resgrid"></div>
-      <p class="hint">한 팀 8명이 서로 다른 도구를 하나씩 배정받아요. 위쪽 참가자를 누르면 사다리를 타고 내려가 도구가 공개돼요. 다음 팀은 "새 사다리"로 재배정!</p>`;
-    svg=el.querySelector('#ladd');
-    // 세로줄
-    for(let c=0;c<n;c++){ line(xOf(c),lineTop,xOf(c),bottomY(),'#cfeaf7',4); }
-    // 가로줄(사다리)
-    for(let r=0;r<rungs.length;r++){ for(let i=0;i<n-1;i++){ if(rungs[r][i]) line(xOf(i),rowY(r),xOf(i+1),rowY(r),'#7fcbec',4); } }
-    // 위 참가자 마커 / 아래 젓가락
-    for(let c=0;c<n;c++){
-      chip(xOf(c),lineTop,'#2aa9e0',String(c+1),true,c);
-      toolLabel(xOf(c),bottomY(),res[c]);
-    }
-    el.querySelector('.cnt').onchange=e=>{ n=Math.max(1,Math.min(TOOLS.length,+e.target.value||1)); gen(); draw(); };
-    el.querySelector('.gen').onclick=()=>{ gen(); draw(); };
-    el.querySelector('.all').onclick=()=>{ for(let c=0;c<n;c++) reveal(c,c*250); };
+      <div class="ctrl" style="justify-content:center;">
+        <button class="btn p sm draw">🎲 팀 순서 뽑기</button>
+        <button class="btn g sm totimer">순서 타이머 ▶</button>
+      </div>
+      <div id="drawres" class="resgrid"></div>`;
     el.querySelector('.totimer').onclick=()=>{ el.hidden=true; document.getElementById('timerStage').hidden=false; };
+    el.querySelector('.draw').onclick=drawTeams;
   }
-  function line(x1,y1,x2,y2,color,w){ const l=document.createElementNS(NS,'line'); l.setAttribute('x1',x1); l.setAttribute('y1',y1); l.setAttribute('x2',x2); l.setAttribute('y2',y2); l.setAttribute('stroke',color); l.setAttribute('stroke-width',w); l.setAttribute('stroke-linecap','round'); svg.appendChild(l); }
-  function chip(x,y,color,label,clickable,c){
-    const g=document.createElementNS(NS,'g'); g.setAttribute('transform',`translate(${x},${y})`);
-    if(clickable){ g.style.cursor='pointer'; g.onclick=()=>reveal(c,0); }
-    const circ=document.createElementNS(NS,'circle'); circ.setAttribute('r',15); circ.setAttribute('fill',color); circ.setAttribute('stroke','#fff'); circ.setAttribute('stroke-width',3); g.appendChild(circ);
-    const t=document.createElementNS(NS,'text'); t.setAttribute('text-anchor','middle'); t.setAttribute('dy','.35em'); t.setAttribute('fill','#fff'); t.setAttribute('font-size','12'); t.setAttribute('font-weight','800'); t.textContent=label; g.appendChild(t);
-    svg.appendChild(g);
+  function drawTeams(){
+    const names=loadTeams();
+    const box=el.querySelector('#drawres'); box.innerHTML='';
+    if(!names){ box.innerHTML='<div class="rescard"><span class="rescard-t">홈 화면에서 팀을 먼저 설정하세요.</span></div>'; return; }
+    const btn=el.querySelector('.draw'); btn.disabled=true;
+    const order=shuffle(names.map((n,i)=>({n,i})));
+    order.forEach((o,k)=>{
+      setTimeout(()=>{
+        const c=TEAMC[o.i%TEAMC.length];
+        const row=document.createElement('div'); row.className='rescard';
+        row.innerHTML=`<span class="rescard-p" style="color:${c.text}">${k+1}번</span><span class="rescard-t">${o.n}</span>`;
+        box.appendChild(row);
+        if(k===order.length-1) btn.disabled=false;
+      }, k*400);
+    });
   }
-  function toolLabel(x,y,name){
-    const dot=document.createElementNS(NS,'circle'); dot.setAttribute('cx',x); dot.setAttribute('cy',y); dot.setAttribute('r',6); dot.setAttribute('fill','#ffb703'); dot.setAttribute('stroke','#fff'); dot.setAttribute('stroke-width',2); svg.appendChild(dot);
-    const t=document.createElementNS(NS,'text'); t.setAttribute('text-anchor','middle'); t.setAttribute('x',x); t.setAttribute('y',y+18); t.setAttribute('font-size','11'); t.setAttribute('font-weight','700'); t.setAttribute('fill','#0e3a52');
-    name.split(' ').forEach((p,i)=>{ const ts=document.createElementNS(NS,'tspan'); ts.setAttribute('x',x); ts.setAttribute('dy',i===0?0:12); ts.textContent=p; t.appendChild(ts); });
-    svg.appendChild(t);
-  }
-  function reveal(c,delay){
-    if(revealed[c]) return;
-    revealed[c]=true;
-    const {pts,end}=trace(c);
-    const color=COLORS[c%COLORS.length];
-    const poly=document.createElementNS(NS,'polyline');
-    poly.setAttribute('points',pts.map(p=>p.join(',')).join(' '));
-    poly.setAttribute('fill','none'); poly.setAttribute('stroke',color); poly.setAttribute('stroke-width',5);
-    poly.setAttribute('stroke-linecap','round'); poly.setAttribute('stroke-linejoin','round');
-    let len=0; for(let i=1;i<pts.length;i++){ len+=Math.hypot(pts[i][0]-pts[i-1][0], pts[i][1]-pts[i-1][1]); }
-    poly.style.strokeDasharray=len; poly.style.strokeDashoffset=len; poly.style.transition='stroke-dashoffset 1s ease';
-    svg.appendChild(poly);
-    setTimeout(()=>requestAnimationFrame(()=>{ poly.style.strokeDashoffset=0; }), delay);
-    setTimeout(()=>{
-      const box=el.querySelector('#laddres');
-      const row=document.createElement('div');
-      row.className='rescard';
-      row.innerHTML=`<span class="rescard-p" style="color:${color}">참가자 ${c+1}</span><span class="rescard-t">${res[end]}</span>`;
-      box.appendChild(row);
-    }, delay+1000);
-  }
-  gen(); draw();
+  render();
 })();
 </script>
 <script>
@@ -144,7 +86,7 @@
   function paint(){
     el.innerHTML=`
       <div class="badge">순서 타이머</div>
-      <div class="ctrl"><button class="btn g sm toladd">← 사다리</button>
+      <div class="ctrl"><button class="btn g sm toladd">← 도구 목록</button>
         1인당 <input type="number" class="tsec" min="1" max="600" value="${secs}"> 초
         &nbsp;·&nbsp; 인원 <input type="number" class="tppl" min="1" max="30" value="${people}"> 명</div>
       <div style="text-align:center; margin:14px 0;">
