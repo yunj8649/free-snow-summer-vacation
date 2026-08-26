@@ -46,9 +46,21 @@ a.btn { text-decoration:none; display:inline-block; }
 .sb input[type=number] { width:56px; text-align:center; padding:6px; }
 .sb input[type=checkbox] { width:auto; padding:0; margin:0 3px 0 0; transform:scale(1.2); accent-color:var(--ok); }
 .wincheck { display:inline-flex; align-items:center; font-size:.72rem; color:var(--mut); margin-top:5px; cursor:pointer; white-space:nowrap; font-weight:700; }
-.scorecell { display:block; width:100%; min-width:54px; padding:10px 8px; border-radius:10px; border:2px solid var(--line); background:#fff; color:var(--mut); cursor:pointer; font-weight:800; font-size:.95rem; white-space:nowrap; }
-.scorecell.on { background:var(--ok); color:#fff; border-color:var(--ok); }
-.scorecell:active { transform:scale(.96); }
+/* 리더보드형 점수판 */
+.lb { display:flex; flex-direction:column; gap:10px; }
+.lb-row { display:flex; align-items:center; gap:12px; background:#fff; border:2px solid var(--line); border-radius:16px; padding:12px 14px; box-shadow:0 4px 14px rgba(14,58,82,.06); transition:transform .15s, box-shadow .15s; }
+.lb-row.top { border-color:var(--accent); background:linear-gradient(135deg,#fffdf3,#fff); box-shadow:0 8px 22px rgba(255,183,3,.22); }
+.lb-rank { flex:none; width:38px; text-align:center; font-size:1.55rem; font-weight:900; color:var(--mut); }
+.lb-main { flex:1; min-width:0; }
+.lb-name { font-weight:800; font-size:1.12rem; color:var(--ink); margin-bottom:7px; }
+.lb-games { display:flex; flex-wrap:wrap; gap:6px; }
+.lb-chip { display:inline-flex; align-items:center; gap:4px; font-size:.85rem; font-weight:800; padding:5px 10px; border-radius:20px; border:1.5px solid var(--line); background:#f7fcff; color:var(--mut); cursor:pointer; line-height:1.1; }
+.lb-chip b { font-weight:900; font-size:.9rem; }
+.lb-chip.on { background:linear-gradient(135deg,var(--teal),var(--sky)); color:#fff; border-color:transparent; box-shadow:0 3px 8px rgba(15,181,166,.28); }
+.lb-chip.cheer.on { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#5a3a00; box-shadow:0 3px 8px rgba(255,158,0,.28); }
+.lb-chip:active { transform:scale(.94); }
+.lb-total { flex:none; font-size:1.7rem; font-weight:900; color:var(--ink); text-align:right; line-height:1; }
+.lb-total span { font-size:.78rem; font-weight:700; color:var(--mut); margin-left:2px; }
 .total { font-weight:900; font-size:1.15rem; color:var(--accent2); }
 .rank1 td:first-child::before { content:"🥇 "; }
 .rank2 td:first-child::before { content:"🥈 "; }
