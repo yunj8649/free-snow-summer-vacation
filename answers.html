@@ -21,8 +21,9 @@
   .o { color:var(--ok); font-weight:900; }
   .x { color:var(--hot); font-weight:900; }
   .note { color:var(--mut); font-size:.9rem; }
-  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:6px 18px; }
-  .grid div { padding:4px 0; border-bottom:1px solid var(--line); }
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px 18px; }
+  .grid div { padding:5px 2px; border-bottom:1px solid var(--line); }
+  @media (max-width:600px){ .grid { grid-template-columns:repeat(2,1fr); gap:6px 12px; } }
   a.home { color:var(--mut); }
 </style>
 </head>
@@ -50,9 +51,7 @@ html+='</ol>';
 // 초성
 html+='<h2>💡 초성 맞추기</h2>';
 for(const [cat,list] of Object.entries(INITIALS)){
-  html+=`<h3>${cat}</h3><ol>`;
-  list.forEach(([q,a])=>{ html+=`<li><span class="q">${q}</span> → <span class="a">${a}</span></li>`; });
-  html+='</ol>';
+  html+=`<h3>${cat}</h3><div class="grid">${list.map(([q,a])=>`<div><span class="q">${q}</span> → <span class="a">${a}</span></div>`).join('')}</div>`;
 }
 
 // 몸으로 말해요 (제시어 = 정답)
