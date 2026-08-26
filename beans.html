@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>콩 옮기기</title>
 <link rel="stylesheet" href="style.css">
+<style>
+  .matchbox{ display:flex; flex-direction:column; gap:12px; margin-top:18px; }
+  .matchcard{ display:flex; align-items:center; justify-content:center; gap:14px; background:#f7fdff; border:2px solid var(--line); border-radius:16px; padding:16px 14px; box-shadow:0 3px 10px rgba(14,58,82,.08); animation:pop .25s ease; }
+  .matchcard .mno{ background:linear-gradient(135deg,var(--teal),var(--sky)); color:#fff; border-radius:12px; padding:5px 11px; font-size:.85rem; font-weight:900; white-space:nowrap; }
+  .matchcard .mteam{ font-size:1.3rem; font-weight:900; }
+  .matchcard .vs{ color:var(--hot); font-weight:900; font-size:1.05rem; }
+  .matchcard .bye{ color:var(--mut); font-size:1rem; font-weight:800; }
+  @keyframes pop{ from{ transform:scale(.85); opacity:0; } to{ transform:scale(1); opacity:1; } }
+</style>
 </head>
 <body>
 <main class="gamepage">
@@ -26,32 +35,37 @@
   function render(){
     el.innerHTML=`
       <div class="badge">콩 옮기기</div>
-      <p class="hint">각 팀에 아래 도구들을 나눠주세요. 팀 안에서 누가 어떤 도구를 쓸지는 자유롭게 정하면 돼요!</p>
+      <p class="hint">각 팀에 아래 도구들을 나눠주세요. 팀 안에서 누가 어떤 도구를 쓸지는 자유롭게 정하면 돼요!<br>2팀씩 짝지어 진행하고, <b>콩을 가장 많이 옮긴 한 팀이 우승</b>이에요.</p>
       <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:16px 0;">
         ${TOOLS.map(t=>`<span style="background:#eafaff; border:2px solid var(--line); color:var(--ink); font-weight:800; padding:10px 16px; border-radius:20px; font-size:1.05rem;">${t}</span>`).join('')}
       </div>
       <div class="ctrl" style="justify-content:center;">
-        <button class="btn p sm draw">🎲 팀 순서 뽑기</button>
+        <button class="btn p sm draw">🎲 대진 뽑기</button>
         <button class="btn g sm totimer">순서 타이머 ▶</button>
       </div>
       <div id="drawres" class="resgrid"></div>`;
     el.querySelector('.totimer').onclick=()=>{ el.hidden=true; document.getElementById('timerStage').hidden=false; };
-    el.querySelector('.draw').onclick=drawTeams;
+    el.querySelector('.draw').onclick=drawBracket;
   }
-  function drawTeams(){
+  function drawBracket(){
     const names=loadTeams();
-    const box=el.querySelector('#drawres'); box.innerHTML='';
-    if(!names){ box.innerHTML='<div class="rescard"><span class="rescard-t">홈 화면에서 팀을 먼저 설정하세요.</span></div>'; return; }
+    const box=el.querySelector('#drawres'); box.className='matchbox'; box.innerHTML='';
+    if(!names){ box.className=''; box.innerHTML='<p class="hint">홈 화면에서 팀을 먼저 설정하세요.</p>'; return; }
     const btn=el.querySelector('.draw'); btn.disabled=true;
     const order=shuffle(names.map((n,i)=>({n,i})));
-    order.forEach((o,k)=>{
+    const matches=[];
+    for(let i=0;i<order.length;i+=2){ matches.push([order[i], order[i+1]||null]); }
+    matches.forEach((m,k)=>{
       setTimeout(()=>{
-        const c=TEAMC[o.i%TEAMC.length];
-        const row=document.createElement('div'); row.className='rescard';
-        row.innerHTML=`<span class="rescard-p" style="color:${c.text}">${k+1}번</span><span class="rescard-t">${o.n}</span>`;
-        box.appendChild(row);
-        if(k===order.length-1) btn.disabled=false;
-      }, k*400);
+        const a=m[0], b=m[1];
+        const card=document.createElement('div'); card.className='matchcard';
+        const A=`<span class="mteam" style="color:${TEAMC[a.i%TEAMC.length].text}">${a.n}</span>`;
+        card.innerHTML = b
+          ? `<span class="mno">${k+1}경기</span>${A}<span class="vs">VS</span><span class="mteam" style="color:${TEAMC[b.i%TEAMC.length].text}">${b.n}</span>`
+          : `<span class="mno">${k+1}경기</span>${A}<span class="bye">부전승</span>`;
+        box.appendChild(card);
+        if(k===matches.length-1) btn.disabled=false;
+      }, k*500);
     });
   }
   render();
