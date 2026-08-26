@@ -100,7 +100,7 @@
       draw();
       st.tick=setInterval(()=>{ st.remain--; if(st.remain<=0){ beep(); stopTick(); return turnResult(); } paintTimer(); }, 1000);
     }
-    function cur(){ if(st.qi>=st.queue.length){ st.queue=shuffle(pool()); st.qi=0; } return st.queue[st.qi]; }
+    function cur(){ return st.queue[st.qi]; }
     function paintTimer(){
       const t=el.querySelector('#tgT'); if(t){ t.textContent=st.remain; t.classList.toggle('low',st.remain<=10); }
       const f=el.querySelector('#tgF'); if(f) f.style.width=Math.max(0,st.remain/st.timePer*100)+'%';
@@ -129,7 +129,9 @@
       el.querySelector('#ok').onclick=()=>{ st.turnScore+=PPC; st.turnWords.push(textOf(it)); st.scores[st.team]+=PPC; nextCard(); };
       const pb=el.querySelector('#pass'); if(pb&&st.passLeft>0) pb.onclick=()=>{ st.passLeft--; nextCard(); };
     }
-    function nextCard(){ st.qi++; st.revealed=false; draw(); }
+    function nextCard(){ st.qi++; st.revealed=false;
+      if(st.qi>=st.queue.length){ beep(); stopTick(); return turnResult(); }  // 덱 소진 → 턴 종료
+      draw(); }
 
     // ---------- 턴 결과 ----------
     function turnResult(){
