@@ -25,6 +25,7 @@
   td.ox { text-align:center; font-weight:900; width:3rem; }
   td.ox.o { color:var(--ok); } td.ox.x { color:var(--hot); }
   td.note { color:var(--mut); font-size:.9rem; }
+  .oxnote { color:#6d7396; font-size:calc(.98rem - 2px); margin-top:5px; }
   a.home { color:var(--mut); }
 </style>
 </head>
@@ -47,7 +48,7 @@ html+='<h2>⭕❌ OX 퀴즈</h2><table class="tbl">'
     + '<thead><tr><th class="num">#</th><th>문제</th><th>정답</th></tr></thead><tbody>';
 OX.forEach((o,i)=>{
   html+=`<tr><td class="num">${i+1}</td>`
-      + `<td>${esc(o.q)}${o.e?`<div class="note" style="margin-top:5px">↳ ${esc(o.e)}</div>`:''}</td>`
+      + `<td>${esc(o.q)}${o.e?`<div class="oxnote">${esc(o.e)}</div>`:''}</td>`
       + `<td class="ox ${o.a?'o':'x'}">${o.a?'O':'X'}</td></tr>`;
 });
 html+='</tbody></table>';
