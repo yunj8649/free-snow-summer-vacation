@@ -44,7 +44,9 @@
   <section id="score">
     <div class="card">
       <div id="noTeams" class="hint">먼저 <b>팀</b> 탭에서 팀을 저장해 주세요.</div>
-      <div id="lb" class="lb"></div>
+      <div style="overflow-x:auto">
+        <table class="sb"><thead id="sbHead"></thead><tbody id="sbBody"></tbody></table>
+      </div>
       <div class="win" id="winner"></div>
       <p class="hint" id="scoreHint"></p>
     </div>
@@ -148,34 +150,29 @@ document.getElementById('saveTeams').onclick=()=>{
 
 /* ---------- scoreboard ---------- */
 function renderScore(){
-  const no=document.getElementById('noTeams'), lb=document.getElementById('lb');
-  if(!state.teams||!state.teams.length){ no.style.display='block'; lb.innerHTML=''; document.getElementById('winner').innerHTML=''; document.getElementById('scoreHint').textContent=''; return; }
+  const no=document.getElementById('noTeams');
+  if(!state.teams||!state.teams.length){ no.style.display='block';
+    document.getElementById('sbHead').innerHTML=''; document.getElementById('sbBody').innerHTML='';
+    document.getElementById('winner').innerHTML=''; document.getElementById('scoreHint').textContent=''; return; }
   no.style.display='none';
+  document.getElementById('sbHead').innerHTML=
+    `<tr><th>팀</th>${GAMES.map(g=>`<th>${g.name}<br><span class="hint">${g.score}</span></th>`).join('')}<th>응원<br><span class="hint">${CHEER_SCORE}</span></th><th>합계</th></tr>`;
   const totals=state.teams.map((_,ti)=>state.scores[ti].reduce((a,b)=>a+(+b||0),0)+(+state.cheer[ti]||0));
-  const order=state.teams.map((t,ti)=>({ti,total:totals[ti]})).sort((a,b)=>b.total-a.total);
-  const medals=['🥇','🥈','🥉'];
-  let rank=0, prev=null;
-  lb.innerHTML=order.map((o,idx)=>{
-    if(o.total!==prev){ rank=idx+1; prev=o.total; }
-    const ti=o.ti, top=(rank===1&&o.total>0);
-    const rankLbl=o.total>0 ? (medals[rank-1]||('#'+rank)) : '–';
-    const chips=GAMES.map((g,gi)=>{
-      const won=(+state.scores[ti][gi]||0)===g.score;
-      return `<button class="lb-chip${won?' on':''}" title="${g.name} (${g.score}점)" data-t="${ti}" data-g="${gi}">${g.emoji}<b>${won?g.score:'–'}</b></button>`;
-    }).join('');
-    const cheerOn=(+state.cheer[ti]||0)===CHEER_SCORE;
-    const cheerChip=`<button class="lb-chip cheer${cheerOn?' on':''}" title="응원 (${CHEER_SCORE}점)" data-t="${ti}">📣<b>${cheerOn?CHEER_SCORE:'–'}</b></button>`;
-    return `<div class="lb-row${top?' top':''}">
-      <div class="lb-rank">${rankLbl}</div>
-      <div class="lb-main"><div class="lb-name">${state.teams[ti].name}</div><div class="lb-games">${chips}${cheerChip}</div></div>
-      <div class="lb-total">${o.total}<span>점</span></div>
-    </div>`;
-  }).join('');
-  lb.querySelectorAll('.lb-chip:not(.cheer)').forEach(b=>b.onclick=()=>{
+  // 순위(색상용)만 계산 — 행 순서는 팀 입력 순서 고정
+  const ranked=[...totals].map((t,i)=>({t,i})).sort((a,b)=>b.t-a.t);
+  const rankOf={}; let prev=null,r=0;
+  ranked.forEach((o,idx)=>{ if(o.t!==prev){r=idx+1;prev=o.t;} rankOf[o.i]=o.t>0?r:0; });
+  document.getElementById('sbBody').innerHTML=state.teams.map((t,ti)=>
+    `<tr class="rank${rankOf[ti]}"><td class="tm">${t.name}</td>${GAMES.map((g,gi)=>{
+       const won=(+state.scores[ti][gi]||0)===g.score;
+       return `<td><button class="wincell${won?' on':''}" data-t="${ti}" data-g="${gi}" title="${g.name} ${g.score}점">${won?'✓':''}</button></td>`;
+     }).join('')}<td><button class="wincell cheer${(+state.cheer[ti]||0)===CHEER_SCORE?' on':''}" data-t="${ti}" title="응원 ${CHEER_SCORE}점">${(+state.cheer[ti]||0)===CHEER_SCORE?'✓':''}</button></td><td class="total">${totals[ti]}</td></tr>`
+  ).join('');
+  document.querySelectorAll('.sb .wincell:not(.cheer)').forEach(b=>b.onclick=()=>{
     const gi=+b.dataset.g, won=(+state.scores[+b.dataset.t][gi]||0)===GAMES[gi].score;
     state.scores[+b.dataset.t][gi] = won ? 0 : GAMES[gi].score; save(state); renderScore();
   });
-  lb.querySelectorAll('.lb-chip.cheer').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.sb .wincell.cheer').forEach(b=>b.onclick=()=>{
     const on=(+state.cheer[+b.dataset.t]||0)===CHEER_SCORE;
     state.cheer[+b.dataset.t]= on?0:CHEER_SCORE; save(state); renderScore();
   });
@@ -185,7 +182,7 @@ function renderScore(){
     (done && max>0) ? `🏆 우승: ${state.teams.map((t,i)=>totals[i]===max?t.name:'').filter(Boolean).join(', ')} (${max}점)` : '';
   if(done && max>0){ if(!renderScore._won){ renderScore._won=true; celebrate(); } }
   else renderScore._won=false;
-  document.getElementById('scoreHint').textContent='게임별 이모지 칩을 누르면 그 게임 배점만큼 반영돼요. 다시 누르면 해제 · 순위는 총점순 자동 정렬.';
+  document.getElementById('scoreHint').textContent='각 칸을 눌러 그 게임 우승 팀을 체크하세요. 다시 누르면 해제.';
 }
 // 우승 축하 컨페티
 function celebrate(){
