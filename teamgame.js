@@ -34,7 +34,7 @@
     const reveal=cfg.reveal||null;
     const PPC=cfg.pointsPerCorrect||1, PASS=cfg.passesPerTurn==null?3:cfg.passesPerTurn;
     const timeOpts=cfg.timeOptions||[60,90,120];
-    const st={ names:loadTeams()||['1팀','2팀'], timePer:timeOpts[0], sel:new Set(deckNames),
+    const st={ names:loadTeams()||['1팀','2팀'], timePer:timeOpts[0], sel:new Set(),
       scores:[], round:1, team:0,
       queue:[], qi:0, turnScore:0, turnWords:[], passLeft:0, remain:0, tick:null, revealed:false };
     const nT=()=>st.names.length;
