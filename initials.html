@@ -5,20 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>초성 맞추기</title>
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="teamgame.css">
 </head>
-<body>
-<main class="gamepage">
-  <div class="card">
-    <a class="btn g sm back-link" href="./index.html">← 진행 순서</a>
-    <div class="stage" id="inStage"></div>
+<body class="tg-body">
+<div class="tg-wrap">
+  <div class="tg-center">
+    <a class="btn g sm back-link tg-back" href="./index.html">← 진행 순서</a>
+    <div id="inStage"></div>
   </div>
-</main>
+</div>
 <script src="data.js"></script>
-<script src="game.js"></script>
+<script src="teamgame.js"></script>
 <script src="bgm.js"></script>
 <script src="bgmbar.js"></script>
 <script>
-  buildInitials('inStage');
+  TeamGame.start('inStage', {
+    title:'초성 맞추기', emoji:'💡',
+    decks: INITIALS,
+    render:(it)=> it[0],   // 초성 힌트
+    text:(it)=> it[1],     // 정답(맞힌 단어 집계)
+    reveal:(it)=> it[1],   // 정답 공개
+    footer:'초성 보고 정답 맞히기! 정답 ○ · 패스 ✕ (정답 공개로 확인)',
+    correctLabel:'○ 정답', passLabel:'✕ 패스',
+    pointsPerCorrect:1, passesPerTurn:3, timeOptions:[60,90,120],
+  });
 </script>
 </body>
 </html>
