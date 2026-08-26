@@ -40,9 +40,9 @@
 .tg-bar{ height:12px; background:var(--line); border-radius:99px; overflow:hidden; margin-bottom:18px; }
 .tg-barfill{ height:100%; background:linear-gradient(135deg,var(--teal),var(--sky)); border-radius:99px; transition:width 1s linear; }
 .tg-wordcard{ background:linear-gradient(135deg,#eafaff,#f2fdfb); border:2px solid var(--line); border-radius:20px;
-  min-height:280px; display:flex; align-items:center; justify-content:center; text-align:center; padding:24px; }
-.tg-word{ font-size:3.2rem; font-weight:800; line-height:1.2; word-break:keep-all; color:var(--ink); }
-.tg-word small{ display:block; font-size:1.5rem; color:var(--teal); margin-top:10px; font-weight:800; }
+  min-height:clamp(320px,62vh,660px); display:flex; align-items:center; justify-content:center; text-align:center; padding:24px; }
+.tg-word{ font-size:clamp(2.6rem,9vw,5.5rem); font-weight:800; line-height:1.15; word-break:keep-all; color:var(--ink); }
+.tg-word small{ display:block; font-size:clamp(1.3rem,4.5vw,2.4rem); color:var(--teal); margin-top:12px; font-weight:800; }
 .tg-revbtn{ margin-top:16px; background:#fff; color:var(--sky); border:2px solid var(--line); border-radius:12px;
   padding:10px 18px; font-size:1rem; font-weight:800; cursor:pointer; }
 .tg-actions{ display:flex; gap:14px; margin-top:16px; }
