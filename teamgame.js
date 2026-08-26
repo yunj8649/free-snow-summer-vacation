@@ -92,8 +92,6 @@
         <span class="tg-badge">${st.round}바퀴</span>
         <div class="tg-emoji">${cfg.emoji||'🎮'}</div>
         <div class="tg-heading" style="color:${tc(st.team).text}">${esc(tname(st.team))} 차례!</div>
-        <div class="tg-sub">설명할 사람은 폰을 들고, 나머지는 맞힐 준비!</div>
-        <div class="tg-teamnote" style="text-align:center">🔀 순서: ${st.order.map((ti,k)=>`${k===st.pos?'▶ ':''}${esc(tname(ti))}`).join('  →  ')}</div>
         ${scoreChips(st.team)}
         <button class="tg-cta" id="go">시작!</button>
       </div>`;
