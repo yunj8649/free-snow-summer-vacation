@@ -46,6 +46,9 @@ a.btn { text-decoration:none; display:inline-block; }
 .sb input[type=number] { width:56px; text-align:center; padding:6px; }
 .sb input[type=checkbox] { width:auto; padding:0; margin:0 3px 0 0; transform:scale(1.2); accent-color:var(--ok); }
 .wincheck { display:inline-flex; align-items:center; font-size:.72rem; color:var(--mut); margin-top:5px; cursor:pointer; white-space:nowrap; font-weight:700; }
+.winbtn { display:block; width:100%; margin-top:5px; font-size:.75rem; padding:5px 6px; border-radius:8px; border:2px solid var(--line); background:#fff; color:var(--mut); cursor:pointer; font-weight:800; }
+.winbtn.on { background:var(--ok); color:#fff; border-color:var(--ok); }
+.winbtn:active { transform:scale(.96); }
 .total { font-weight:900; font-size:1.15rem; color:var(--accent2); }
 .rank1 td:first-child::before { content:"🥇 "; }
 .rank2 td:first-child::before { content:"🥈 "; }
