@@ -43,14 +43,14 @@ const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[
 let html='';
 
 // OX
-html+='<h2>⭕❌ OX 퀴즈</h2><div class="scroll"><table class="tbl">'
-    + '<thead><tr><th>#</th><th>문제</th><th>정답</th><th>해설</th></tr></thead><tbody>';
+html+='<h2>⭕❌ OX 퀴즈</h2><table class="tbl">'
+    + '<thead><tr><th class="num">#</th><th>문제</th><th>정답</th></tr></thead><tbody>';
 OX.forEach((o,i)=>{
-  html+=`<tr><td class="num">${i+1}</td><td>${esc(o.q)}</td>`
-      + `<td class="ox ${o.a?'o':'x'}">${o.a?'O':'X'}</td>`
-      + `<td class="note">${o.e?esc(o.e):''}</td></tr>`;
+  html+=`<tr><td class="num">${i+1}</td>`
+      + `<td>${esc(o.q)}${o.e?`<div class="note" style="margin-top:5px">↳ ${esc(o.e)}</div>`:''}</td>`
+      + `<td class="ox ${o.a?'o':'x'}">${o.a?'O':'X'}</td></tr>`;
 });
-html+='</tbody></table></div>';
+html+='</tbody></table>';
 
 // 초성 맞추기
 html+='<h2>💡 초성 맞추기</h2>';
